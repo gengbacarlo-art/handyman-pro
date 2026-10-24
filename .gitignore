@@ -8,6 +8,9 @@ node_modules/
 database.sqlite
 database.sqlite-shm
 database.sqlite-wal
+handyman.sqlite
+handyman.sqlite-shm
+handyman.sqlite-wal
 psdata.json
 
 # Logs
