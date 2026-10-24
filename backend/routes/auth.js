@@ -134,6 +134,9 @@ router.post('/google', async (req, res) => {
       if (!r.ok || data.aud !== clientId) {
         return res.status(401).json({ error: 'Invalid Google token' });
       }
+      if (!data.email) {
+        return res.status(401).json({ error: 'Google token has no email' });
+      }
       if (String(data.email_verified) !== 'true') {
         return res.status(401).json({ error: 'Google email not verified' });
       }
