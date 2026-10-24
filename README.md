@@ -252,3 +252,4 @@ The data model is Stripe Connect ready. To go live:
 5. Add license/background verification for handymen.
 6. Add dispute resolution and admin moderation tools.
 7. Deploy the backend (Railway, Render, Fly.io) behind HTTPS.
+8. Set `window.HANDYMAN_APP_URL` and replace the demo contact address in `docs/index.html`.
