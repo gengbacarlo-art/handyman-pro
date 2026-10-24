@@ -3,7 +3,7 @@
 A complete marketplace workflow for local home services. Clients post jobs, handymen submit proposals, clients hire, work runs through milestone escrow, and both sides leave reviews. The platform fee is a flat **18%** — handymen keep **82%**.
 
 **Surfaces**
-- **Landing page** — `http://localhost:4000/`
+- **Landing page** — `http://localhost:4000/` (standalone copy: `docs/index.html`)
 - **Pricing page** — `http://localhost:4000/pricing`
 - **Web app** — `http://localhost:4000/app`
 - **REST API** — `http://localhost:4000/api/*`
@@ -51,6 +51,9 @@ handyman-marketplace/
 │       ├── payments.js        # fund / submit / approve / request changes, summaries
 │       ├── reviews.js         # two-way reviews
 │       └── admin.js           # platform stats, users, jobs, contracts
+├── docs/
+│   ├── index.html             # Standalone landing page (GitHub Pages / Netlify)
+│   └── .nojekyll
 └── android/                   # legacy Kotlin/Compose client
 ```
 
@@ -72,6 +75,41 @@ cd handyman-marketplace\backend
 Open **http://localhost:4000/** for the landing page and **http://localhost:4000/app** for the app.
 
 The server creates `backend/handyman.sqlite` on first run and seeds demo data automatically.
+
+## Standalone landing page
+
+`docs/index.html` is a single self-contained marketing page — inline CSS and JavaScript, no external fonts, images or dependencies. It includes:
+
+- hero with a job/proposal mockup
+- trade categories
+- client and handyman workflows
+- trust features and escrow flow
+- pricing cards, a $500 escrow example and a client/handyman comparison table
+- demo reviews
+- FAQ
+- contact section with a `mailto:` form
+- responsive mobile menu
+
+The backend serves the same page at `/` from `backend/public/landing.html`.
+
+### Point the CTAs at your app
+
+Open `docs/index.html` (or `backend/public/landing.html`) and set:
+
+```js
+window.HANDYMAN_APP_URL = 'https://your-app.example.com';
+```
+
+Leave it empty to use `/app` on localhost. On other hosts the fallback is `http://localhost:4000/app`, so set the URL before publishing the page publicly. Replace the placeholder `hello@handymanpro.example` address in the contact section with your own.
+
+### Deploy with GitHub Pages
+
+1. Push the repository.
+2. **Settings → Pages → Build and deployment → Deploy from a branch**.
+3. Choose **`main`** and **`/docs`**, then save.
+4. The page is published at `https://gengbacarlo-art.github.io/handyman-pro/`.
+
+For Netlify or Vercel, deploy the `docs/` directory as a static site.
 
 ## Demo accounts
 

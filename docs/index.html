@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Handyman Pro — Hire trusted local handymen</title>
+<meta name="description" content="Post a job for free, compare proposals from vetted local handymen, and pay securely through milestone escrow. Handymen keep 82%.">
+<meta name="theme-color" content="#0d7f00">
+<meta property="og:title" content="Handyman Pro — Hire trusted local handymen">
+<meta property="og:description" content="Post a job for free, compare proposals from vetted local pros, and pay securely through milestones. Handymen keep 82%.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d7f00'/%3E%3Cpath d='M18 18h8v11h12V18h8v28h-8V36H26v10h-8z' fill='white'/%3E%3C/svg%3E">
+<script>
+  // Standalone deployment: set this to your live app URL before publishing.
+  // Leave empty to use /app on localhost, or the local demo app elsewhere.
+  window.HANDYMAN_APP_URL = '';
+</script>
+<style>
+  :root{
+    --green:#0d7f00; --green-bright:#14a800; --green-dark:#0b6f00; --green-soft:#e9f7e5;
+    --ink:#001e00; --text:#4f6150; --muted:#637563; --line:#d7e2d7;
+    --bg:#f6faf5; --white:#fff; --amber:#f2b01e;
+    --radius:18px; --shadow:0 20px 60px rgba(0,30,0,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--white);color:var(--ink);font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  button,input,textarea{font:inherit}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .skip-link{position:absolute;left:16px;top:-60px;z-index:200;background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:700;transition:top .15s}
+  .skip-link:focus{top:12px}
+  :focus-visible{outline:3px solid rgba(20,168,0,.45);outline-offset:3px}
+  section[id]{scroll-margin-top:88px}
+
+  /* buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border-radius:10px;font-weight:700;font-size:14px;border:1px solid transparent;transition:.15s;white-space:nowrap;cursor:pointer}
+  .btn.primary{background:var(--green);color:#fff}
+  .btn.primary:hover{background:var(--green-dark)}
+  .btn.secondary{background:#fff;border-color:var(--line);color:var(--ink)}
+  .btn.secondary:hover{border-color:var(--green);color:var(--green-dark)}
+  .btn.ghost{color:var(--text)}
+  .btn.ghost:hover{color:var(--ink)}
+  .btn.lg{padding:14px 26px;font-size:15px;border-radius:12px}
+  .btn.block{width:100%}
+
+  /* header */
+  .site-header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);transition:box-shadow .2s}
+  .site-header.scrolled{box-shadow:0 8px 28px rgba(0,30,0,.07)}
+  .nav-inner{max-width:1160px;margin:0 auto;padding:0 24px;height:68px;display:flex;align-items:center;gap:28px;position:relative}
+  .logo{display:inline-flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:-.4px;white-space:nowrap}
+  .logo-mark{width:30px;height:30px;border-radius:9px;background:var(--green);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;box-shadow:0 0 0 4px rgba(20,168,0,.10)}
+  .nav-links{display:flex;align-items:center;gap:22px;font-size:14px;font-weight:600;color:var(--text)}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-actions{margin-left:auto;display:flex;gap:10px;align-items:center}
+  .menu-toggle{display:none;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;align-items:center;justify-content:center;flex-direction:column;gap:4px;cursor:pointer;padding:0}
+  .menu-toggle span{display:block;width:17px;height:2px;background:var(--ink);border-radius:2px;transition:.18s}
+  .menu-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+  .menu-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
+  .menu-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+  .mobile-cta{display:none}
+
+  /* hero */
+  .hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#f3fbf1 0%,#ffffff 78%)}
+  .hero::before{content:'';position:absolute;top:-280px;right:-180px;width:760px;height:760px;border-radius:50%;background:radial-gradient(closest-side,rgba(20,168,0,.12),transparent 70%);pointer-events:none}
+  .hero::after{content:'';position:absolute;left:-160px;bottom:-260px;width:520px;height:520px;border-radius:50%;background:radial-gradient(closest-side,rgba(20,168,0,.07),transparent 70%);pointer-events:none}
+  .hero-inner{max-width:1160px;margin:0 auto;padding:76px 24px 72px;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;position:relative;z-index:1}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--green-soft);border:1px solid #cde8c7;color:var(--green-dark);font-size:12px;font-weight:800;padding:6px 13px;border-radius:999px;margin-bottom:22px;text-transform:uppercase;letter-spacing:.6px}
+  .eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green-bright)}
+  h1{font-size:clamp(38px,5vw,62px);line-height:1.05;letter-spacing:-1.8px;font-weight:800}
+  h1 .green{color:var(--green-dark)}
+  .sub{max-width:550px;margin-top:20px;color:var(--text);font-size:17px}
+  .sub b{color:var(--ink)}
+  .hero-cta{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
+  .micro{display:flex;gap:18px;flex-wrap:wrap;margin-top:22px;font-size:13px;color:var(--text)}
+  .micro span{display:flex;align-items:center;gap:6px}
+  .micro span::before{content:'✓';color:var(--green-dark);font-weight:900}
+
+  /* hero mockup */
+  .mock{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:24px;position:relative}
+  .mock::after{content:'Payment released · $196.80';position:absolute;bottom:-18px;left:26px;background:var(--ink);color:#fff;font-size:12px;font-weight:700;padding:9px 14px;border-radius:10px;box-shadow:0 10px 24px rgba(0,30,0,.22)}
+  .mock-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .pill-open{background:var(--green-soft);color:var(--green-dark);font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;padding:4px 9px;border-radius:999px}
+  .mock-posted{font-size:11px;color:var(--muted)}
+  .mock h3{font-size:19px;letter-spacing:-.4px;line-height:1.3}
+  .mock-meta{font-size:12px;color:var(--text);margin-top:6px;display:flex;flex-wrap:wrap;gap:4px 12px}
+  .mock-proposals{margin-top:16px;display:grid;gap:8px}
+  .mp{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:11px;padding:10px 12px}
+  .mp.highlight{border-color:#bfe3b8;background:#fbfef9}
+  .av{width:34px;height:34px;border-radius:50%;background:var(--green-soft);color:var(--green-dark);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;border:1px solid #cde8c7}
+  .mp b{font-size:13px;display:block}
+  .mp .stars{color:var(--amber);font-size:10px;letter-spacing:1px}
+  .mp .who{font-size:11px;color:var(--text)}
+  .mp .bid{font-weight:800;font-size:14px}
+  .mock-foot{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--muted)}
+
+  /* categories */
+  .cats{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg)}
+  .cats-inner{max-width:1160px;margin:0 auto;padding:20px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .cats .label{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-right:6px}
+  .cat{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--text);transition:.15s}
+  .cat:hover{border-color:var(--green);color:var(--green-dark);background:#fbfef9}
+
+  /* sections */
+  .section{padding:84px 0}
+  .section.soft{background:var(--bg);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .section-head{text-align:center;max-width:660px;margin:0 auto 48px}
+  .kicker{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;color:var(--green-dark);margin-bottom:10px}
+  h2{font-size:clamp(28px,3.6vw,40px);line-height:1.15;letter-spacing:-1px;font-weight:800}
+  .lead{color:var(--text);font-size:16px;margin-top:12px}
+
+  /* how it works */
+  .steps{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .steps-col{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:30px;box-shadow:0 8px 24px rgba(0,30,0,.03)}
+  .steps-col .head{display:flex;align-items:center;gap:10px;margin-bottom:22px;flex-wrap:wrap}
+  .steps-col .head .tag{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;padding:5px 11px;border-radius:999px;background:var(--green-soft);color:var(--green-dark)}
+  .steps-col h3{font-size:20px;letter-spacing:-.4px}
+  .step{display:grid;grid-template-columns:32px 1fr;gap:14px;padding:14px 0;border-bottom:1px dashed var(--line)}
+  .step:last-child{border-bottom:none;padding-bottom:0}
+  .step .n{width:32px;height:32px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+  .step b{display:block;font-size:15px}
+  .step p{font-size:13px;color:var(--text);margin-top:2px}
+  .flow{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:24px;padding:18px 22px;background:#fff;border:1px solid var(--line);border-radius:14px;font-size:13px;font-weight:700;color:var(--ink)}
+  .flow i{font-style:normal;color:var(--green-dark);font-weight:900}
+  .flow span{display:inline-flex;align-items:center;gap:7px}
+  .flow span::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green-bright)}
+
+  /* features */
+  .features{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .feature{border:1px solid var(--line);border-radius:16px;padding:26px;background:#fff;transition:.15s}
+  .feature:hover{border-color:#bfe3b8;box-shadow:0 10px 30px rgba(0,30,0,.05);transform:translateY(-2px)}
+  .feature .ico{width:44px;height:44px;border-radius:12px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px;border:1px solid #cde8c7}
+  .feature h3{font-size:16px;margin-bottom:6px;letter-spacing:-.2px}
+  .feature p{font-size:14px;color:var(--text)}
+  .trust-band{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px;padding:24px;background:var(--ink);border-radius:16px;color:#fff}
+  .trust-item{display:flex;gap:12px;align-items:flex-start}
+  .trust-item .tick{width:28px;height:28px;flex:0 0 auto;border-radius:50%;background:rgba(20,168,0,.25);color:#8ee07f;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px}
+  .trust-item b{display:block;font-size:14px}
+  .trust-item span{display:block;font-size:12px;color:#b9d3b5;margin-top:2px}
+
+  /* pricing */
+  .pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:stretch}
+  .plan{background:#fff;border:1px solid var(--line);border-radius:20px;padding:32px;display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(0,30,0,.03)}
+  .plan.featured{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:0 24px 60px rgba(0,30,0,.16)}
+  .plan .tag{display:inline-flex;align-self:flex-start;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;padding:5px 11px;border-radius:999px;background:var(--green-soft);color:var(--green-dark);margin-bottom:18px}
+  .plan.featured .tag{background:rgba(20,168,0,.22);color:#a8ee9c}
+  .plan h3{font-size:21px;letter-spacing:-.4px}
+  .plan .desc{font-size:14px;color:var(--text);margin-top:6px}
+  .plan.featured .desc{color:#b9d3b5}
+  .price{display:flex;align-items:baseline;gap:8px;margin-top:22px}
+  .price b{font-size:46px;line-height:1;letter-spacing:-2px;font-weight:800}
+  .price small{font-size:12px;color:var(--muted);font-weight:600}
+  .plan.featured .price small{color:#b9d3b5}
+  .plan ul{list-style:none;display:grid;gap:10px;margin:24px 0 28px;font-size:14px;color:var(--text)}
+  .plan.featured ul{color:#d6e8d2}
+  .plan li{display:flex;gap:10px;align-items:flex-start}
+  .plan li::before{content:'✓';color:var(--green-dark);font-weight:900;flex:0 0 auto}
+  .plan.featured li::before{color:#8ee07f}
+  .plan .btn{margin-top:auto}
+  .plan .fine{font-size:11px;color:var(--muted);margin-top:12px;text-align:center}
+  .plan.featured .fine{color:#9db69a}
+  .pricing-detail{display:grid;grid-template-columns:1fr 1.15fr;gap:22px;margin-top:22px;align-items:stretch}
+  .example{background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:0 18px 50px rgba(0,30,0,.05)}
+  .example .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+  .example .top b{font-size:16px}
+  .example .top span{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+  .ex-row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;font-size:14px;border-bottom:1px dashed var(--line)}
+  .ex-row:last-of-type{border-bottom:none}
+  .ex-row.fee-row{color:#946200}
+  .ex-row.earn{color:var(--green-dark);font-weight:800;font-size:16px}
+  .example .note{font-size:11px;color:var(--muted);margin-top:14px;line-height:1.6}
+  .table-wrap{background:#fff;border:1px solid var(--line);border-radius:18px;padding:8px 22px;box-shadow:0 18px 50px rgba(0,30,0,.05);overflow-x:auto}
+  table.compare{width:100%;border-collapse:collapse;font-size:13px;min-width:480px}
+  table.compare caption{text-align:left;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);padding:16px 0 10px}
+  table.compare th,table.compare td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.compare thead th{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:800}
+  table.compare tbody tr:last-child td{border-bottom:none}
+  table.compare td:first-child{color:var(--text);font-weight:600}
+  table.compare td:not(:first-child),table.compare th:not(:first-child){text-align:center}
+  table.compare .yes{color:var(--green-dark);font-weight:800}
+  .pricing-note{text-align:center;font-size:12px;color:var(--muted);margin-top:18px}
+
+  /* testimonials */
+  .quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .quote-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px;display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(0,30,0,.03)}
+  .quote-stars{color:var(--amber);letter-spacing:2px;font-size:13px;margin-bottom:14px}
+  .quote-card blockquote{font-size:15px;line-height:1.6;color:var(--ink);flex:1}
+  .quote-card blockquote::before{content:'“';color:var(--green);font-size:34px;line-height:0;vertical-align:-10px;margin-right:2px;font-weight:800}
+  .quote-person{display:flex;align-items:center;gap:11px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+  .quote-person .av{width:38px;height:38px;font-size:12px}
+  .quote-person b{display:block;font-size:13px}
+  .quote-person span{display:block;font-size:11px;color:var(--text)}
+  .quote-meta{display:inline-flex;align-self:flex-start;margin-top:14px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--green-dark);background:var(--green-soft);border:1px solid #cde8c7;padding:4px 9px;border-radius:999px}
+  .demo-note{text-align:center;font-size:11px;color:var(--muted);margin-top:22px}
+
+  /* faq */
+  .faq-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:48px;align-items:start}
+  .faq-copy{position:sticky;top:96px}
+  .faq-copy h2{text-align:left}
+  .faq-copy .lead{text-align:left}
+  .faq-copy .btn{margin-top:22px}
+  .faq-list{border-top:1px solid var(--line)}
+  details{border-bottom:1px solid var(--line);padding:4px 0}
+  summary{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:17px 0;font-size:15px;font-weight:700;cursor:pointer;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:'+';font-size:22px;line-height:1;color:var(--green-dark);font-weight:400;flex:0 0 auto;transition:transform .15s}
+  details[open] summary::after{content:'−'}
+  details p{font-size:14px;color:var(--text);padding:0 28px 18px 0;margin-top:-2px}
+  details p a{color:var(--green-dark);font-weight:700;text-decoration:underline;text-underline-offset:2px}
+
+  /* contact */
+  .contact{background:var(--ink);color:#fff;padding:84px 0;position:relative;overflow:hidden}
+  .contact::before{content:'';position:absolute;right:-220px;top:-220px;width:600px;height:600px;border-radius:50%;background:radial-gradient(closest-side,rgba(20,168,0,.18),transparent 70%);pointer-events:none}
+  .contact-inner{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;position:relative;z-index:1}
+  .contact-copy .kicker{color:#8ee07f}
+  .contact-copy h2{color:#fff;font-size:clamp(30px,4vw,44px)}
+  .contact-copy p{color:#b9d3b5;margin-top:14px;font-size:16px;max-width:480px}
+  .contact-cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+  .contact .btn.primary{background:var(--green);color:#fff}
+  .contact .btn.primary:hover{background:var(--green-dark)}
+  .contact .btn.secondary{background:transparent;border-color:rgba(255,255,255,.35);color:#fff}
+  .contact .btn.secondary:hover{border-color:#fff;color:#fff}
+  .contact-copy .micro{color:#b9d3b5}
+  .contact-copy .micro span::before{color:#8ee07f}
+  .contact-card{background:#fff;color:var(--ink);border-radius:20px;padding:30px;box-shadow:0 30px 80px rgba(0,0,0,.22)}
+  .contact-card .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px}
+  .contact-card h3{font-size:20px;letter-spacing:-.4px}
+  .contact-card .demo-pill{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--green-dark);background:var(--green-soft);border:1px solid #cde8c7;padding:4px 9px;border-radius:999px;white-space:nowrap}
+  .contact-card .card-sub{font-size:13px;color:var(--text);margin-bottom:18px}
+  .contact-card .card-sub a{color:var(--green-dark);font-weight:700}
+  .field{margin-bottom:13px}
+  .field label{display:block;font-size:12px;font-weight:800;margin-bottom:5px}
+  .field input,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 13px;background:#fff;color:var(--ink);font-size:14px;transition:.15s}
+  .field input:focus,.field textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(20,168,0,.12)}
+  .field textarea{resize:vertical;min-height:92px}
+  .contact-form .btn{margin-top:4px}
+  .contact-note{font-size:11px;color:var(--muted);line-height:1.55;margin-top:11px}
+  .contact-note code{font-size:10px;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:1px 4px}
+
+  /* footer */
+  .site-footer{border-top:1px solid var(--line);padding:56px 0 24px;color:var(--text);font-size:13px;background:#fff}
+  .footer-grid{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:32px}
+  .footer-brand p{font-size:13px;color:var(--text);margin-top:14px;max-width:300px}
+  .footer-brand .demo-badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--green-dark);background:var(--green-soft);border:1px solid #cde8c7;padding:4px 9px;border-radius:999px;margin-top:14px}
+  .footer-brand .demo-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green-bright)}
+  .footer-col h4{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:12px}
+  .footer-col a{display:block;padding:4px 0;font-size:13px;color:var(--text)}
+  .footer-col a:hover{color:var(--green-dark)}
+  .footer-bottom{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);margin-top:40px;padding-top:20px;font-size:11px;color:var(--muted)}
+  .footer-bottom a{color:var(--text);font-weight:600}
+  .footer-bottom a:hover{color:var(--green-dark)}
+  .footer-fine{font-size:11px;color:var(--muted)}
+
+  /* responsive */
+  @media(max-width:980px){
+    .hero-inner{grid-template-columns:1fr;gap:44px;padding-top:54px;padding-bottom:64px}
+    .hero .sub{max-width:620px}
+    .steps{grid-template-columns:1fr}
+    .features{grid-template-columns:1fr 1fr}
+    .trust-band{grid-template-columns:1fr}
+    .pricing-grid{grid-template-columns:1fr}
+    .pricing-detail{grid-template-columns:1fr}
+    .quotes{grid-template-columns:1fr 1fr}
+    .faq-grid{grid-template-columns:1fr;gap:28px}
+    .faq-copy{position:static}
+    .contact-inner{grid-template-columns:1fr;gap:34px}
+    .footer-grid{grid-template-columns:1.4fr 1fr 1fr}
+    .footer-brand{grid-column:1/-1}
+  }
+  @media(max-width:900px){
+    .nav-links{display:none;position:absolute;top:68px;left:0;right:0;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 18px 30px rgba(0,30,0,.08);padding:14px 24px 20px;flex-direction:column;align-items:stretch;gap:0}
+    .nav-links.open{display:flex}
+    .nav-links > a{padding:11px 0;border-bottom:1px solid var(--line);font-size:15px}
+    .nav-links > a:last-of-type{border-bottom:none}
+    .nav-actions .btn{display:none}
+    .menu-toggle{display:flex}
+    .mobile-cta{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+    .mobile-cta .btn{flex:1}
+  }
+  @media(max-width:760px){
+    .section{padding:64px 0}
+    .section-head{margin-bottom:34px}
+    .features{grid-template-columns:1fr}
+    .quotes{grid-template-columns:1fr}
+    .footer-grid{grid-template-columns:1fr 1fr}
+    .footer-brand{grid-column:1/-1}
+    .hero-cta .btn{flex:1 1 220px}
+    .flow{gap:8px;font-size:12px}
+    .mock{padding:20px}
+    .mock::after{left:16px;bottom:-16px;font-size:11px}
+    .pricing-grid{gap:16px}
+    .plan{padding:26px}
+    .contact{padding:64px 0}
+    .contact-card{padding:24px}
+  }
+  @media(max-width:560px){
+    .wrap,.nav-inner,.hero-inner,.cats-inner{padding-left:18px;padding-right:18px}
+    .logo{font-size:17px}
+    .logo-mark{width:27px;height:27px;font-size:14px}
+    h1{letter-spacing:-1.2px}
+    .hero-inner{padding-top:42px;padding-bottom:56px}
+    .hero-cta{flex-direction:column}
+    .hero-cta .btn{width:100%}
+    .micro{gap:10px 14px;font-size:12px}
+    .mock-foot{flex-direction:column;gap:4px}
+    .mp{grid-template-columns:30px 1fr auto;gap:8px;padding:9px 10px}
+    .av{width:30px;height:30px;font-size:10px}
+    .mp b{font-size:12px}
+    .mp .who{font-size:10px}
+    .mp .bid{font-size:13px}
+    .cats-inner{padding-top:16px;padding-bottom:16px}
+    .cats .label{width:100%;margin-bottom:2px}
+    .section{padding:56px 0}
+    h2{letter-spacing:-.7px}
+    .steps-col{padding:24px}
+    .flow{align-items:flex-start;flex-direction:column;gap:6px}
+    .flow i{display:none}
+    .plan{padding:24px}
+    .price b{font-size:40px}
+    .example,.table-wrap{padding:22px}
+    .table-wrap{padding:6px 16px}
+    .contact-card{padding:22px}
+    .contact-copy h2{font-size:30px}
+    .footer-grid{grid-template-columns:1fr 1fr}
+    .footer-bottom{flex-direction:column;align-items:flex-start}
+  }
+  @media(prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{transition:none!important}
+    .feature:hover{transform:none}
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header" id="top">
+  <div class="nav-inner">
+    <a class="logo" href="#top" aria-label="Handyman Pro home">
+      <span class="logo-mark" aria-hidden="true">H</span>
+      Handyman Pro
+    </a>
+
+    <nav class="nav-links" id="nav-links" aria-label="Main navigation">
+      <a href="#how">How it works</a>
+      <a href="#why">Why us</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#stories">Reviews</a>
+      <a href="#faq">FAQ</a>
+      <div class="mobile-cta">
+        <a class="btn secondary" data-app-link data-app-path="#/dashboard" href="/app">Sign in</a>
+        <a class="btn primary" data-app-link data-app-path="#/dashboard" href="/app">Get started</a>
+      </div>
+    </nav>
+
+    <div class="nav-actions">
+      <a class="btn ghost" data-app-link data-app-path="#/dashboard" href="/app">Sign in</a>
+      <a class="btn primary" data-app-link data-app-path="#/dashboard" href="/app">Get started</a>
+      <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="eyebrow">The home services marketplace</span>
+        <h1>Find trusted handymen.<br><span class="green">Get it done.</span></h1>
+        <p class="sub">Post a job for free, compare proposals from vetted local pros, and pay securely through milestones. Handymen keep <b>82%</b> of every job.</p>
+        <div class="hero-cta">
+          <a class="btn primary lg" data-app-link data-app-path="#/job-new" href="/app">Post a job — it's free</a>
+          <a class="btn secondary lg" data-app-link data-app-path="#/jobs" href="/app">Find work</a>
+        </div>
+        <div class="micro">
+          <span>No subscriptions</span>
+          <span>Escrow-protected payments</span>
+          <span>18% flat fee</span>
+        </div>
+      </div>
+
+      <div class="mock">
+        <div class="mock-top">
+          <span class="pill-open">Open</span>
+          <span class="mock-posted">Posted 2h ago</span>
+        </div>
+        <h3>Fix leaking kitchen sink and replace faucet</h3>
+        <div class="mock-meta">
+          <span>Plumbing</span>
+          <span>Fixed price <b>$200–$300</b></span>
+          <span>Intermediate</span>
+        </div>
+        <div class="mock-proposals">
+          <div class="mp highlight">
+            <span class="av">BB</span>
+            <div><b>Bob Builder</b><span class="stars">★★★★★</span> <span class="who">5.0 · Licensed plumber</span></div>
+            <span class="bid">$240</span>
+          </div>
+          <div class="mp">
+            <span class="av">PP</span>
+            <div><b>Pete Plumb</b><span class="stars">★★★★☆</span> <span class="who">4.8 · Emergency plumber</span></div>
+            <span class="bid">$225</span>
+          </div>
+        </div>
+        <div class="mock-foot"><span>2 proposals</span><span>Escrow protected · 82% to pro</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cats">
+    <div class="cats-inner">
+      <span class="label">Popular</span>
+      <a class="cat" data-app-link data-app-path="#/jobs" href="/app">Plumbing</a>
+      <a class="cat" data-app-link data-app-path="#/jobs" href="/app">Electrical</a>
+      <a class="cat" data-app-link data-app-path="#/jobs" href="/app">Carpentry</a>
+      <a class="cat" data-app-link data-app-path="#/jobs" href="/app">Painting</a>
+      <a class="cat" data-app-link data-app-path="#/jobs" href="/app">Furniture Assembly</a>
+      <a class="cat" data-app-link data-app-path="#/jobs" href="/app">Cleaning</a>
+      <a class="cat" data-app-link data-app-path="#/jobs" href="/app">HVAC</a>
+      <a class="cat" data-app-link data-app-path="#/jobs" href="/app">Appliance Repair</a>
+    </div>
+  </div>
+
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">How it works</div>
+        <h2>Hiring, minus the guesswork</h2>
+        <p class="lead">A transparent marketplace built around proposals, contracts and milestones — so both sides know exactly what happens next.</p>
+      </div>
+
+      <div class="steps">
+        <div class="steps-col">
+          <div class="head"><span class="tag">For clients</span><h3>Get your project done</h3></div>
+          <div class="step"><span class="n">1</span><div><b>Post your job</b><p>Describe the work, set a budget and timeline. Posting is always free.</p></div></div>
+          <div class="step"><span class="n">2</span><div><b>Compare proposals</b><p>Review bids, ratings, experience and cover letters side by side.</p></div></div>
+          <div class="step"><span class="n">3</span><div><b>Hire and fund a milestone</b><p>Your payment is held in escrow — the pro knows the money is there.</p></div></div>
+          <div class="step"><span class="n">4</span><div><b>Approve and release</b><p>Pay only when you're happy with the work, then leave a review.</p></div></div>
+        </div>
+
+        <div class="steps-col">
+          <div class="head"><span class="tag">For handymen</span><h3>Build a business you own</h3></div>
+          <div class="step"><span class="n">1</span><div><b>Create your profile</b><p>Show your trade, skills, rate, experience and availability.</p></div></div>
+          <div class="step"><span class="n">2</span><div><b>Send proposals</b><p>Bid your price and timeline on jobs that fit your skills.</p></div></div>
+          <div class="step"><span class="n">3</span><div><b>Do great work</b><p>Message the client, share updates and submit completed milestones.</p></div></div>
+          <div class="step"><span class="n">4</span><div><b>Keep 82%</b><p>Get paid when the client approves. Build reviews that win better jobs.</p></div></div>
+        </div>
+      </div>
+
+      <div class="flow" aria-label="Escrow flow">
+        <span>Client funds milestone</span><i>→</i>
+        <span>Pro completes the work</span><i>→</i>
+        <span>Client approves</span><i>→</i>
+        <span>82% released</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section soft" id="why">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">Why Handyman Pro</div>
+        <h2>Built for trust on both sides</h2>
+        <p class="lead">Everything you need to hire confidently, get paid fairly and keep the work moving.</p>
+      </div>
+      <div class="features">
+        <div class="feature">
+          <div class="ico" aria-hidden="true">🔒</div>
+          <h3>Escrow-protected milestones</h3>
+          <p>Clients fund a milestone up front. The money is held safely and only released when the work is approved.</p>
+        </div>
+        <div class="feature">
+          <div class="ico" aria-hidden="true">💚</div>
+          <h3>One flat 18% fee</h3>
+          <p>No connects, no subscriptions, no hidden charges. Handymen take home 82% of every milestone they complete.</p>
+        </div>
+        <div class="feature">
+          <div class="ico" aria-hidden="true">⭐</div>
+          <h3>Reputation that travels</h3>
+          <p>Detailed profiles and two-way reviews after every contract help you hire — and get hired — with confidence.</p>
+        </div>
+        <div class="feature">
+          <div class="ico" aria-hidden="true">💬</div>
+          <h3>Built-in messaging</h3>
+          <p>Discuss scope, share progress and request changes in one contract thread. No lost texts or email chains.</p>
+        </div>
+        <div class="feature">
+          <div class="ico" aria-hidden="true">🧾</div>
+          <h3>Fixed or hourly work</h3>
+          <p>Post either kind of job. Milestones keep fixed-price projects on track and hourly work predictable.</p>
+        </div>
+        <div class="feature">
+          <div class="ico" aria-hidden="true">📊</div>
+          <h3>Dashboards that make sense</h3>
+          <p>Clients track spend and proposals. Handymen track earnings, escrow and win rates. Admins see the whole platform.</p>
+        </div>
+      </div>
+
+      <div class="trust-band">
+        <div class="trust-item"><span class="tick" aria-hidden="true">✓</span><div><b>Escrow held until approval</b><span>No release without a client sign-off.</span></div></div>
+        <div class="trust-item"><span class="tick" aria-hidden="true">✓</span><div><b>Two-way reviews</b><span>Both sides build a public track record.</span></div></div>
+        <div class="trust-item"><span class="tick" aria-hidden="true">✓</span><div><b>Admin oversight</b><span>Platform stats and moderation tools built in.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pricing">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">Simple pricing</div>
+        <h2>One flat fee. No surprises.</h2>
+        <p class="lead">Clients post, compare and hire for free. A flat 18% fee is deducted only when a milestone is released — handymen keep 82%.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <div class="plan">
+          <span class="tag">For clients</span>
+          <h3>Hire with confidence</h3>
+          <p class="desc">Find the right pro, agree the scope and pay through escrow.</p>
+          <div class="price"><b>$0</b><small>to post and hire</small></div>
+          <ul>
+            <li>Unlimited job posts and proposals</li>
+            <li>Talent search and public profiles</li>
+            <li>Milestone escrow protection</li>
+            <li>Contract messaging and change requests</li>
+            <li>Two-way reviews after completion</li>
+          </ul>
+          <a class="btn secondary block" data-app-link data-app-path="#/job-new" href="/app">Post a job</a>
+          <div class="fine">No subscription. No posting fee.</div>
+        </div>
+
+        <div class="plan featured">
+          <span class="tag">For handymen</span>
+          <h3>Keep more of what you earn</h3>
+          <p class="desc">Send proposals, win contracts and get paid when the work is approved.</p>
+          <div class="price"><b>18%</b><small>per released milestone</small></div>
+          <ul>
+            <li>Unlimited proposals on open jobs</li>
+            <li>Public profile with reviews and ratings</li>
+            <li>Escrow-protected payouts</li>
+            <li>82% take-home on every release</li>
+            <li>Earnings and win-rate dashboard</li>
+          </ul>
+          <a class="btn primary block" data-app-link data-app-path="#/jobs" href="/app">Find work</a>
+          <div class="fine">No connects, credits or monthly fees.</div>
+        </div>
+      </div>
+
+      <div class="pricing-detail">
+        <div class="example">
+          <div class="top"><b>Example milestone</b><span>18% platform fee</span></div>
+          <div class="ex-row"><span>Client funds milestone</span><b>$500.00</b></div>
+          <div class="ex-row fee-row"><span>Platform fee (18%)</span><span>−$90.00</span></div>
+          <div class="ex-row earn"><span>Handyman receives (82%)</span><span>$410.00</span></div>
+          <p class="note">The client pays the agreed contract amount. The fee is deducted when the milestone is released — the handyman sees the 82% take-home before accepting the job.</p>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare">
+            <caption>Compare what each side pays</caption>
+            <thead>
+              <tr><th scope="col">Feature</th><th scope="col">Clients</th><th scope="col">Handymen</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Post a job / send proposals</td><td class="yes">Free</td><td class="yes">Free</td></tr>
+              <tr><td>Monthly subscription</td><td>$0</td><td>$0</td></tr>
+              <tr><td>Platform fee</td><td>No added fee</td><td>18% at release</td></tr>
+              <tr><td>Take-home</td><td>—</td><td class="yes">82%</td></tr>
+              <tr><td>Connects or credits</td><td>None</td><td>None</td></tr>
+              <tr><td>Escrow protection</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+              <tr><td>Two-way reviews</td><td class="yes">Included</td><td class="yes">Included</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p class="pricing-note">Hourly contracts use a 40-hour work block. The same 82/18 split applies to each released milestone.</p>
+    </div>
+  </section>
+
+  <section class="section soft" id="stories">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">Reviews</div>
+        <h2>Trusted on both sides</h2>
+        <p class="lead">Real workflow, real reviews — here's what the demo marketplace looks like in action.</p>
+      </div>
+
+      <div class="quotes">
+        <article class="quote-card">
+          <div class="quote-stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote>Bob replaced the faucet and shower head in one visit. I approved the milestone and the payment released instantly.</blockquote>
+          <div class="quote-person">
+            <span class="av" aria-hidden="true">AC</span>
+            <div><b>Alice C.</b><span>Client · Plumbing contract</span></div>
+          </div>
+          <span class="quote-meta">Completed contract</span>
+        </article>
+
+        <article class="quote-card">
+          <div class="quote-stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote>The milestone was funded before I started. I knew exactly what I'd take home — 82% — and got paid on approval.</blockquote>
+          <div class="quote-person">
+            <span class="av" aria-hidden="true">BB</span>
+            <div><b>Bob B.</b><span>Handyman · Plumber</span></div>
+          </div>
+          <span class="quote-meta">5-star handyman</span>
+        </article>
+
+        <article class="quote-card">
+          <div class="quote-stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote>We split the office build into two milestones. Approving each phase kept the scope and the budget honest.</blockquote>
+          <div class="quote-person">
+            <span class="av" aria-hidden="true">DG</span>
+            <div><b>Dave G.</b><span>Client · Assembly contract</span></div>
+          </div>
+          <span class="quote-meta">Active contract</span>
+        </article>
+      </div>
+      <p class="demo-note">Demo reviews from the seeded marketplace. Names are demo accounts.</p>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="wrap">
+      <div class="faq-grid">
+        <div class="faq-copy">
+          <div class="kicker">FAQ</div>
+          <h2>Questions, answered</h2>
+          <p class="lead">Everything you need to know about fees, escrow and getting started. Can't find your answer? We're happy to help.</p>
+          <a class="btn secondary" href="#contact">Contact us</a>
+        </div>
+
+        <div class="faq-list">
+          <details>
+            <summary>Who pays the 18% fee?</summary>
+            <p>The fee is deducted from the contract amount when a milestone is released. The handyman receives 82%; the client pays the agreed contract amount with no added platform fee.</p>
+          </details>
+          <details>
+            <summary>When am I charged?</summary>
+            <p>Posting a job, sending proposals and hiring are free. The client funds a milestone before work starts. The money is held in escrow and released only when the client approves the completed work.</p>
+          </details>
+          <details>
+            <summary>Are there connects, credits or subscriptions?</summary>
+            <p>No. There are no connects, credits, monthly subscriptions or hidden charges. The only platform fee is the flat 18% on each released milestone.</p>
+          </details>
+          <details>
+            <summary>How does escrow work?</summary>
+            <p>The client funds a milestone, the handyman completes and submits the work, and the client approves or requests changes. On approval, 82% is released to the handyman and 18% is retained by the platform.</p>
+          </details>
+          <details>
+            <summary>What if I'm not happy with the work?</summary>
+            <p>Request changes from the contract page. The milestone stays funded while the handyman revises the work. If you still can't agree, contact support for help resolving the contract.</p>
+          </details>
+          <details>
+            <summary>Is this real money?</summary>
+            <p>Not in this demo. Funding, releases and payouts are simulated so you can walk through the full workflow. The data model is Stripe Connect-ready for real escrow payments.</p>
+          </details>
+          <details>
+            <summary>Can I cancel a job or contract?</summary>
+            <p>Open jobs can be cancelled before a contract starts. Once work is underway, use milestones and change requests to adjust the scope. Completed contracts stay in your history with their reviews.</p>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap contact-inner">
+      <div class="contact-copy">
+        <div class="kicker">Get started</div>
+        <h2>Your next project starts here.</h2>
+        <p>Post a job for free, compare proposals and hire with escrow protection — or find your next contract as a handyman.</p>
+        <div class="contact-cta">
+          <a class="btn primary lg" data-app-link data-app-path="#/job-new" href="/app">Post a job</a>
+          <a class="btn secondary lg" data-app-link data-app-path="#/jobs" href="/app">Find work</a>
+        </div>
+        <div class="micro">
+          <span>Free to join</span>
+          <span>No subscriptions</span>
+          <span>82% to pros</span>
+        </div>
+      </div>
+
+      <div class="contact-card">
+        <div class="card-top">
+          <h3>Talk to us</h3>
+          <span class="demo-pill">Demo</span>
+        </div>
+        <p class="card-sub">Prefer email? Write to <a href="mailto:hello@handymanpro.example">hello@handymanpro.example</a>.</p>
+        <form class="contact-form" id="contact-form" action="mailto:hello@handymanpro.example" method="post" enctype="text/plain">
+          <div class="field">
+            <label for="contact-name">Name</label>
+            <input id="contact-name" name="name" type="text" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="contact-email">Email</label>
+            <input id="contact-email" name="email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="contact-message">Message</label>
+            <textarea id="contact-message" name="message" rows="3" required></textarea>
+          </div>
+          <button class="btn primary block" type="submit">Send message</button>
+          <p class="contact-note">This demo form opens your email app. Replace <code>hello@handymanpro.example</code> with your own address before publishing.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="logo" href="#top" aria-label="Handyman Pro home">
+          <span class="logo-mark" aria-hidden="true">H</span>
+          Handyman Pro
+        </a>
+        <p>The home services marketplace built around proposals, contracts and milestone escrow.</p>
+        <span class="demo-badge">Demo marketplace</span>
+      </div>
+
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#stories">Reviews</a>
+        <a href="#faq">FAQ</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>For pros</h4>
+        <a data-app-link data-app-path="#/jobs" href="/app">Find work</a>
+        <a data-app-link data-app-path="#/talent" href="/app">Talent</a>
+        <a data-app-link data-app-path="#/dashboard" href="/app">Dashboard</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#contact">Contact</a>
+        <a href="https://github.com/gengbacarlo-art/handyman-pro" target="_blank" rel="noopener">GitHub</a>
+        <a href="#top">Back to top ↑</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© <span id="year">2026</span> Handyman Pro. Original Handyman Pro branding.</span>
+      <span class="footer-fine">Payments are simulated in this demo. <a data-app-link data-app-path="#/dashboard" href="/app">Open the app</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var configured = (window.HANDYMAN_APP_URL || '').replace(/\/$/, '');
+  var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  var APP_URL = configured || (isLocal ? '/app' : 'http://localhost:4000/app');
+
+  document.querySelectorAll('[data-app-link]').forEach(function (link) {
+    link.href = APP_URL + (link.getAttribute('data-app-path') || '');
+  });
+
+  var header = document.querySelector('.site-header');
+  var toggle = document.querySelector('.menu-toggle');
+  var nav = document.getElementById('nav-links');
+
+  function closeMenu() {
+    nav.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Open menu');
+  }
+
+  toggle.addEventListener('click', function () {
+    var open = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  });
+
+  nav.querySelectorAll('a').forEach(function (link) {
+    link.addEventListener('click', closeMenu);
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') closeMenu();
+  });
+
+  window.addEventListener('resize', function () {
+    if (window.innerWidth > 900) closeMenu();
+  });
+
+  window.addEventListener('scroll', function () {
+    header.classList.toggle('scrolled', window.scrollY > 8);
+  }, { passive: true });
+
+  var form = document.getElementById('contact-form');
+  if (form) {
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      var name = document.getElementById('contact-name').value.trim();
+      var email = document.getElementById('contact-email').value.trim();
+      var message = document.getElementById('contact-message').value.trim();
+      var subject = encodeURIComponent('Handyman Pro inquiry from ' + name);
+      var body = encodeURIComponent(message + '\n\n— ' + name + '\n' + email);
+      window.location.href = 'mailto:hello@handymanpro.example?subject=' + subject + '&body=' + body;
+    });
+  }
+
+  var year = document.getElementById('year');
+  if (year) year.textContent = new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
