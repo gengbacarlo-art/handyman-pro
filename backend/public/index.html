@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Handyman Pro</title>
+<style>
+  :root{
+    --bg:#0B1120; --panel:#151C2B; --panel2:#1C2536; --border:#2A3550;
+    --text:#E5EAF3; --muted:#8B97AD; --primary:#3B82F6; --primary2:#2563EB;
+    --secondary:#10B981; --danger:#EF4444; --amber:#F59E0B; --purple:#8B5CF6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;min-height:100vh}
+  a{color:var(--primary)}
+  .hidden{display:none !important}
+
+  /* ---- Layout ---- */
+  header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:var(--panel);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+  .brand{font-weight:700;font-size:18px;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--secondary)}
+  .userbox{display:flex;align-items:center;gap:12px;font-size:14px}
+  .role-pill{background:var(--panel2);border:1px solid var(--border);padding:3px 10px;border-radius:999px;font-size:12px;color:var(--muted);text-transform:capitalize}
+  main{max-width:1100px;margin:0 auto;padding:24px}
+  .banner{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);color:#FCD34D;padding:10px 16px;border-radius:10px;margin-bottom:20px;font-size:13px}
+
+  /* ---- Cards & grids ---- */
+  .grid{display:grid;gap:16px}
+  .grid.cols-2{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+  .grid.cols-3{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px}
+  .card h3{font-size:16px;margin-bottom:6px}
+  .muted{color:var(--muted);font-size:13px}
+  .section-title{font-size:20px;font-weight:700;margin:26px 0 14px}
+  .section-title:first-child{margin-top:0}
+
+  /* ---- Buttons ---- */
+  button{font-family:inherit;cursor:pointer;border:none;border-radius:9px;font-size:14px;font-weight:600;padding:9px 16px;transition:.15s}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .btn-primary{background:var(--primary);color:#fff}
+  .btn-primary:hover:not(:disabled){background:var(--primary2)}
+  .btn-secondary{background:var(--secondary);color:#04231A}
+  .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+  .btn-ghost:hover{border-color:var(--primary)}
+  .btn-danger{background:transparent;border:1px solid var(--danger);color:var(--danger)}
+  .btn-sm{padding:6px 12px;font-size:13px}
+
+  /* ---- Forms ---- */
+  label{display:block;font-size:13px;color:var(--muted);margin:12px 0 5px}
+  input,select,textarea{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit;outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--primary)}
+
+  /* ---- Auth ---- */
+  .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .auth-card{width:100%;max-width:420px;background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:28px}
+  .auth-card h1{font-size:24px;margin-bottom:4px}
+  .tabs{display:flex;gap:8px;margin:18px 0 8px}
+  .tabs button{flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--muted)}
+  .tabs button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+  .role-toggle{display:flex;gap:8px}
+  .role-toggle button{flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--muted)}
+  .role-toggle button.active{background:var(--secondary);color:#04231A;border-color:var(--secondary)}
+
+  /* ---- Badges & stars ---- */
+  .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;text-transform:capitalize}
+  .badge.pending{background:rgba(245,158,11,.15);color:#FCD34D}
+  .badge.accepted{background:rgba(59,130,246,.15);color:#93C5FD}
+  .badge.in_progress{background:rgba(139,92,246,.15);color:#C4B5FD}
+  .badge.completed{background:rgba(16,185,129,.15);color:#6EE7B7}
+  .badge.cancelled{background:rgba(239,68,68,.15);color:#FCA5A5}
+  .stars{color:var(--amber);font-size:14px;letter-spacing:1px}
+  .avatar{width:42px;height:42px;border-radius:50%;background:var(--panel2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:var(--primary)}
+
+  .row{display:flex;align-items:center;gap:12px}
+  .between{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .wrap{flex-wrap:wrap}
+  .amounts{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);font-size:13px}
+  .amounts .line{display:flex;justify-content:space-between;padding:2px 0}
+  .amounts .fee{color:var(--amber)}
+  .amounts .earn{color:var(--secondary);font-weight:600}
+
+  /* ---- Stat cards ---- */
+  .stat{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center}
+  .stat .value{font-size:26px;font-weight:800}
+  .stat .label{font-size:12px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+
+  /* ---- Table ---- */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border)}
+  th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+
+  /* ---- Modal ---- */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(5,8,17,.75);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+  .modal{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:24px;width:100%;max-width:480px;max-height:90vh;overflow:auto}
+  .modal h2{font-size:20px;margin-bottom:4px}
+
+  /* ---- Toast ---- */
+  #toast{position:fixed;bottom:24px;right:24px;z-index:200;display:flex;flex-direction:column;gap:8px}
+  .toast{background:var(--panel2);border:1px solid var(--border);border-left:4px solid var(--secondary);padding:12px 16px;border-radius:10px;font-size:14px;max-width:340px;box-shadow:0 8px 24px rgba(0,0,0,.4);animation:slideIn .2s}
+  .toast.error{border-left-color:var(--danger)}
+  @keyframes slideIn{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
+
+  .split-preview{display:flex;gap:10px;margin-top:10px}
+  .split-preview .box{flex:1;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center}
+  .split-preview .box .v{font-weight:700;font-size:16px}
+  .split-preview .box .l{font-size:11px;color:var(--muted);text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+<div id="modal-root"></div>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen" class="hidden">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="brand"><span class="dot"></span> Handyman Pro</div>
+      <h1 id="auth-title">Sign in</h1>
+      <p class="muted" id="auth-sub">Clients hire handymen. Platform keeps 18%.</p>
+
+      <div class="tabs">
+        <button id="tab-login" class="active" onclick="app.showLogin()">Sign in</button>
+        <button id="tab-register" onclick="app.showRegister()">Create account</button>
+      </div>
+
+      <!-- Login form -->
+      <form id="login-form" onsubmit="app.login(event)">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com" required>
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" required>
+        <div style="margin-top:18px">
+          <button type="submit" class="btn-primary" style="width:100%" id="login-btn">Sign in</button>
+        </div>
+      </form>
+
+      <!-- Register form -->
+      <form id="register-form" class="hidden" onsubmit="app.register(event)">
+        <label>I am a...</label>
+        <div class="role-toggle">
+          <button type="button" id="role-client" class="active" onclick="app.setRegRole('client')">Client</button>
+          <button type="button" id="role-handyman" onclick="app.setRegRole('handyman')">Handyman</button>
+        </div>
+        <label>Full name</label>
+        <input type="text" id="reg-name" placeholder="Jane Doe" required>
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="you@example.com" required>
+        <label>Password</label>
+        <input type="password" id="reg-password" placeholder="At least 6 characters" required minlength="6">
+        <label>Phone</label>
+        <input type="text" id="reg-phone" placeholder="+1 555 123 4567">
+        <div id="handyman-fields" class="hidden">
+          <label>Service category</label>
+          <select id="reg-category">
+            <option>General Handyman</option><option>Plumbing</option><option>Electrical</option>
+            <option>Carpentry</option><option>Painting</option><option>Cleaning</option>
+            <option>HVAC</option><option>Appliance Repair</option>
+          </select>
+          <label>Hourly rate ($)</label>
+          <input type="number" id="reg-rate" value="50" min="10">
+          <label>Years of experience</label>
+          <input type="number" id="reg-exp" value="3" min="0">
+        </div>
+        <div style="margin-top:18px">
+          <button type="submit" class="btn-primary" style="width:100%" id="register-btn">Create account</button>
+        </div>
+      </form>
+
+      <p class="muted" style="margin-top:16px;font-size:12px">
+        Demo accounts — Admin: <b>admin@handyman.app</b> / <b>admin123</b> · Handyman: <b>bob@builder.com</b> / <b>password123</b>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" class="hidden">
+  <header>
+    <div class="brand"><span class="dot"></span> Handyman Pro</div>
+    <div class="userbox">
+      <span class="role-pill" id="header-role"></span>
+      <span id="header-name"></span>
+      <button class="btn-ghost btn-sm" onclick="app.logout()">Log out</button>
+    </div>
+  </header>
+  <main>
+    <div id="demo-banner" class="banner hidden">⚠️ Demo mode — payments are simulated. Add Stripe keys in <code>backend/.env</code> to enable real payments and payouts.</div>
+    <div id="view"></div>
+  </main>
+</div>
+
+<script>
+const API = '/api';
+
+// ============================================================
+// MOCK API — used automatically when the backend is not reachable
+// (e.g. the file is opened directly). Data lives in localStorage.
+// ============================================================
+const MockDB = {
+  key: 'hp_mock_db',
+  get(){
+    const raw = localStorage.getItem(this.key);
+    if (raw) { try { return JSON.parse(raw); } catch(e){} }
+    return this.seed();
+  },
+  save(db){ localStorage.setItem(this.key, JSON.stringify(db)); },
+  seed(){
+    const now = new Date().toISOString();
+    const db = {
+      seq: 5,
+      users: [
+        { id: 1, email: 'admin@handyman.app', password: 'admin123', role: 'admin', full_name: 'Platform Admin', phone: null, address: null, created_at: now },
+        { id: 2, email: 'bob@builder.com', password: 'password123', role: 'handyman', full_name: 'Bob Builder', phone: '+1 555 0102', address: 'Austin, TX', created_at: now },
+        { id: 3, email: 'mary@mason.com', password: 'password123', role: 'handyman', full_name: 'Mary Mason', phone: '+1 555 0103', address: 'Austin, TX', created_at: now },
+        { id: 4, email: 'carl@tiler.com', password: 'password123', role: 'handyman', full_name: 'Carl Tiler', phone: '+1 555 0104', address: 'Round Rock, TX', created_at: now }
+      ],
+      profiles: [
+        { user_id: 2, category: 'Plumbing', hourly_rate: 75, bio: 'Licensed plumber, 10 years', experience_years: 10, is_available: 1, rating: 4.8, total_jobs: 23 },
+        { user_id: 3, category: 'Electrical', hourly_rate: 85, bio: 'Certified electrician', experience_years: 8, is_available: 1, rating: 4.6, total_jobs: 17 },
+        { user_id: 4, category: 'Carpentry', hourly_rate: 60, bio: 'Custom woodwork & repairs', experience_years: 12, is_available: 1, rating: 4.9, total_jobs: 31 }
+      ],
+      jobs: [], payments: [], reviews: [],
+      nextJobId: 1, nextPayId: 1, nextReviewId: 1
+    };
+    this.save(db);
+    return db;
+  }
+};
+
+async function mockRequest(path, method, body){
+  const db = MockDB.get();
+  const save = () => MockDB.save(db);
+  const [pathOnly, queryStr] = path.split('?');
+  const q = new URLSearchParams(queryStr || '');
+  const segs = pathOnly.split('/').filter(Boolean);
+  const currentUser = () => {
+    const id = parseInt(String(app.state.token || '').replace('mock_', ''), 10);
+    return db.users.find(u => u.id === id) || null;
+  };
+  const requireUser = () => { const u = currentUser(); if (!u) throw new Error('Access token required'); return u; };
+  const pub = u => ({ id: u.id, email: u.email, role: u.role, full_name: u.full_name, phone: u.phone, address: u.address, created_at: u.created_at });
+  const deco = j => ({
+    ...j,
+    client_name: (db.users.find(u => u.id === j.client_id) || {}).full_name || null,
+    handyman_name: (db.users.find(u => u.id === j.handyman_id) || {}).full_name || null
+  });
+  const round2 = n => Math.round(n * 100) / 100;
+
+  if (segs[0] === 'config') return { demoMode: true, commission: 0.18, standalone: true };
+
+  // AUTH
+  if (segs[0] === 'auth' && segs[1] === 'login' && method === 'POST') {
+    const u = db.users.find(x => x.email === body.email && x.password === body.password);
+    if (!u) throw new Error('Invalid credentials');
+    return { token: 'mock_' + u.id, user: pub(u) };
+  }
+  if (segs[0] === 'auth' && segs[1] === 'register' && method === 'POST') {
+    if (!body.full_name || !body.email || !body.password || !body.role) throw new Error('Missing required fields');
+    if (db.users.some(x => x.email === body.email)) throw new Error('Email already registered');
+    const u = { id: db.seq++, email: body.email, password: body.password, role: body.role, full_name: body.full_name, phone: body.phone || null, address: body.address || null, created_at: new Date().toISOString() };
+    db.users.push(u);
+    if (body.role === 'handyman') {
+      db.profiles.push({ user_id: u.id, category: body.category || 'General Handyman', hourly_rate: body.hourly_rate || 50, bio: body.bio || null, experience_years: body.experience_years || 0, is_available: 1, rating: 0, total_jobs: 0 });
+    }
+    save();
+    return { token: 'mock_' + u.id, user: pub(u) };
+  }
+  if (segs[0] === 'auth' && segs[1] === 'me') return { user: pub(requireUser()) };
+
+  // HANDYMEN
+  if (segs[0] === 'users' && segs[1] === 'handymen' && method === 'GET') {
+    let list = db.profiles.map(p => {
+      const u = db.users.find(x => x.id === p.user_id);
+      return { ...p, id: p.user_id, full_name: u.full_name, phone: u.phone, address: u.address };
+    });
+    const cat = q.get('category');
+    if (cat) list = list.filter(h => h.category === cat);
+    list.sort((a, b) => b.rating - a.rating);
+    return { handymen: list };
+  }
+
+  // JOBS
+  if (segs[0] === 'jobs' && method === 'POST') {
+    const u = requireUser();
+    const b = body;
+    if (!b.handyman_id || !b.title || !b.address || !b.scheduled_at || !b.total_amount) throw new Error('Missing required fields');
+    const job = {
+      id: db.nextJobId++, client_id: u.id, handyman_id: b.handyman_id, category_id: null,
+      title: b.title, description: b.description || null, address: b.address, scheduled_at: b.scheduled_at,
+      status: 'pending', total_amount: b.total_amount, platform_fee: round2(b.total_amount * 0.18),
+      handyman_earning: round2(b.total_amount * 0.82), stripe_payment_intent_id: null, created_at: new Date().toISOString()
+    };
+    db.jobs.push(job); save();
+    return { job: deco(job) };
+  }
+  if (segs[0] === 'jobs' && method === 'GET' && segs.length === 1) {
+    const u = requireUser();
+    let list = db.jobs;
+    if (u.role === 'client') list = list.filter(j => j.client_id === u.id);
+    else if (u.role === 'handyman') list = list.filter(j => j.handyman_id === u.id);
+    return { jobs: list.slice().reverse().map(deco) };
+  }
+  if (segs[0] === 'jobs' && segs[2] === 'status' && method === 'PATCH') {
+    const u = requireUser();
+    const job = db.jobs.find(j => j.id === parseInt(segs[1], 10));
+    if (!job) throw new Error('Job not found');
+    if (u.role === 'handyman' && job.handyman_id !== u.id) throw new Error('Not your job');
+    if (u.role === 'client' && job.client_id !== u.id) throw new Error('Not your job');
+    if (u.role === 'client' && body.status !== 'cancelled') throw new Error('Clients can only cancel jobs');
+    job.status = body.status; save();
+    return { message: 'Job status updated to ' + body.status };
+  }
+
+  // PAYMENTS
+  if (segs[0] === 'payments' && segs[1] === 'create-intent' && method === 'POST') {
+    const u = requireUser();
+    const job = db.jobs.find(j => j.id === body.job_id && j.client_id === u.id);
+    if (!job) throw new Error('Job not found or not yours');
+    if (job.status !== 'pending' && job.status !== 'accepted') throw new Error('Job is not awaiting payment');
+    const n = db.nextPayId++;
+    const pid = 'mock_pi_' + n;
+    db.payments.push({ id: n, job_id: job.id, amount: job.total_amount, status: 'pending', stripe_payment_intent_id: pid });
+    save();
+    return { clientSecret: 'mock_secret', paymentIntentId: pid, demo: true, breakdown: { total: job.total_amount, platform_fee: job.platform_fee, handyman_earning: job.handyman_earning } };
+  }
+  if (segs[0] === 'payments' && segs[1] === 'confirm' && method === 'POST') {
+    requireUser();
+    const p = db.payments.find(x => x.stripe_payment_intent_id === body.payment_intent_id);
+    if (!p) throw new Error('Payment not found');
+    p.status = 'completed';
+    const job = db.jobs.find(j => j.id === body.job_id);
+    if (job) {
+      job.status = 'completed';
+      const prof = db.profiles.find(x => x.user_id === job.handyman_id);
+      if (prof) prof.total_jobs += 1;
+    }
+    save();
+    return { status: 'completed', message: 'Payment simulated. Handyman credited 82%; platform kept 18%.' };
+  }
+  if (segs[0] === 'payments' && segs[1] === 'earnings' && method === 'GET') {
+    const u = requireUser();
+    const rows = db.jobs.filter(j => j.handyman_id === u.id);
+    const total = rows.filter(r => r.status === 'completed').reduce((s, r) => s + r.handyman_earning, 0);
+    const pending = rows.filter(r => r.status !== 'completed' && r.status !== 'cancelled').reduce((s, r) => s + r.handyman_earning, 0);
+    const comm = rows.filter(r => r.status === 'completed').reduce((s, r) => s + r.platform_fee, 0);
+    return { jobs: rows.slice().reverse().map(deco), total_earnings: round2(total), pending_earnings: round2(pending), commission_paid: round2(comm) };
+  }
+
+  // REVIEWS
+  if (segs[0] === 'reviews' && method === 'POST') {
+    const u = requireUser();
+    const job = db.jobs.find(j => j.id === body.job_id && j.client_id === u.id && j.status === 'completed');
+    if (!job) throw new Error('Job not found, not yours, or not completed');
+    if (db.reviews.some(r => r.job_id === job.id)) throw new Error('Review already exists for this job');
+    db.reviews.push({ id: db.nextReviewId++, job_id: job.id, client_id: u.id, handyman_id: job.handyman_id, rating: body.rating, comment: body.comment || null, created_at: new Date().toISOString() });
+    const prof = db.profiles.find(x => x.user_id === job.handyman_id);
+    if (prof) {
+      const rs = db.reviews.filter(r => r.handyman_id === job.handyman_id);
+      prof.rating = Math.round(rs.reduce((s, r) => s + r.rating, 0) / rs.length * 100) / 100;
+    }
+    save();
+    return { message: 'Review submitted', rating: prof ? prof.rating : null };
+  }
+  if (segs[0] === 'reviews' && segs[1] === 'handyman' && method === 'GET') {
+    requireUser();
+    const hid = parseInt(segs[2], 10);
+    const rows = db.reviews.filter(r => r.handyman_id === hid).map(r => ({
+      ...r, client_name: (db.users.find(u => u.id === r.client_id) || {}).full_name || 'Client'
+    })).reverse();
+    return { reviews: rows };
+  }
+
+  // ADMIN
+  if (segs[0] === 'admin' && segs[1] === 'stats' && method === 'GET') {
+    const completed = db.jobs.filter(j => j.status === 'completed');
+    return {
+      users: db.users.length,
+      handymen: db.users.filter(u => u.role === 'handyman').length,
+      clients: db.users.filter(u => u.role === 'client').length,
+      jobs: db.jobs.length,
+      completed: completed.length,
+      pending: db.jobs.filter(j => j.status === 'pending').length,
+      platform_revenue: round2(completed.reduce((s, j) => s + j.platform_fee, 0))
+    };
+  }
+  if (segs[0] === 'admin' && segs[1] === 'users' && segs.length === 2 && method === 'GET') {
+    return { users: db.users.map(pub).reverse() };
+  }
+  if (segs[0] === 'admin' && segs[1] === 'users' && segs[3] === 'role' && method === 'PATCH') {
+    const u = db.users.find(x => x.id === parseInt(segs[2], 10));
+    if (!u) throw new Error('User not found');
+    u.role = body.role; save();
+    return { message: 'Role updated' };
+  }
+  if (segs[0] === 'admin' && segs[1] === 'jobs' && method === 'GET') {
+    return { jobs: db.jobs.slice().reverse().map(deco) };
+  }
+
+  throw new Error('Not found: ' + method + ' ' + path);
+}
+
+const app = {
+  state: {
+    token: localStorage.getItem('hp_token'),
+    user: JSON.parse(localStorage.getItem('hp_user') || 'null'),
+    config: null,
+    handymen: [],
+    jobs: [],
+    category: '',
+    reviews: [],
+    earnings: null,
+    adminStats: null,
+    adminUsers: [],
+    adminJobs: [],
+    adminTab: 'users',
+    regRole: 'client',
+    newRating: 5,
+  },
+
+  // ---------- utilities ----------
+  esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); },
+  money(n){ return '$' + Number(n || 0).toFixed(2); },
+  stars(r){ const full = Math.round(r); return '★'.repeat(full) + '☆'.repeat(5 - full); },
+  initials(name){ return (name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase(); },
+  toast(msg, isError){
+    const el = document.createElement('div');
+    el.className = 'toast' + (isError ? ' error' : '');
+    el.textContent = msg;
+    document.getElementById('toast').appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  },
+  async api(path, method = 'GET', body){
+    if (app.state.mockMode) return mockRequest(path, method, body);
+    const res = await fetch(API + path, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(app.state.token ? { Authorization: 'Bearer ' + app.state.token } : {})
+      },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+    return data;
+  },
+  saveSession(token, user){
+    app.state.token = token;
+    app.state.user = user;
+    localStorage.setItem('hp_token', token);
+    localStorage.setItem('hp_user', JSON.stringify(user));
+  },
+  logout(){
+    localStorage.removeItem('hp_token');
+    localStorage.removeItem('hp_user');
+    app.state.token = null;
+    app.state.user = null;
+    app.render();
+  },
+  modal(html){
+    document.getElementById('modal-root').innerHTML =
+      '<div class="modal-backdrop" onclick="if(event.target===this)app.closeModal()"><div class="modal">' + html + '</div></div>';
+  },
+  closeModal(){ document.getElementById('modal-root').innerHTML = ''; },
+
+  // ---------- boot ----------
+  async boot(){
+    app.state.mockMode = location.protocol === 'file:';
+    app.state.config = { demoMode: true, commission: 0.18 };
+    if (!app.state.mockMode) {
+      try { app.state.config = await app.api('/config'); }
+      catch(e) { app.state.mockMode = true; }
+    }
+    if (app.state.token) {
+      try {
+        const me = await app.api('/auth/me');
+        app.state.user = me.user;
+        localStorage.setItem('hp_user', JSON.stringify(me.user));
+      } catch(e) {
+        app.state.token = null; app.state.user = null;
+        localStorage.removeItem('hp_token'); localStorage.removeItem('hp_user');
+      }
+    }
+    app.render();
+  },
+
+  render(){
+    const authed = !!app.state.user;
+    document.getElementById('auth-screen').classList.toggle('hidden', authed);
+    document.getElementById('app').classList.toggle('hidden', !authed);
+    if (!authed) return;
+
+    document.getElementById('header-name').textContent = app.state.user.full_name;
+    document.getElementById('header-role').textContent = app.state.user.role;
+    const banner = document.getElementById('demo-banner');
+    if (app.state.mockMode) {
+      banner.innerHTML = '🔌 Standalone demo — data is saved in your browser only. For the full version: run <code>npm start</code> in <code>backend/</code>, then open <b>http://localhost:4000</b>.';
+      banner.classList.remove('hidden');
+    } else {
+      const demo = app.state.config && app.state.config.demoMode;
+      banner.innerHTML = '⚠️ Demo mode — payments are simulated. Add Stripe keys in <code>backend/.env</code> to enable real payments and payouts.';
+      banner.classList.toggle('hidden', !demo);
+    }
+
+    if (app.state.user.role === 'client') app.renderClient();
+    else if (app.state.user.role === 'handyman') app.renderHandyman();
+    else app.renderAdmin();
+  },
+
+  // ---------- auth screen ----------
+  showLogin(){
+    document.getElementById('login-form').classList.remove('hidden');
+    document.getElementById('register-form').classList.add('hidden');
+    document.getElementById('tab-login').classList.add('active');
+    document.getElementById('tab-register').classList.remove('active');
+    document.getElementById('auth-title').textContent = 'Sign in';
+  },
+  showRegister(){
+    document.getElementById('login-form').classList.add('hidden');
+    document.getElementById('register-form').classList.remove('hidden');
+    document.getElementById('tab-login').classList.remove('active');
+    document.getElementById('tab-register').classList.add('active');
+    document.getElementById('auth-title').textContent = 'Create account';
+  },
+  setRegRole(role){
+    app.state.regRole = role;
+    document.getElementById('role-client').classList.toggle('active', role === 'client');
+    document.getElementById('role-handyman').classList.toggle('active', role === 'handyman');
+    document.getElementById('handyman-fields').classList.toggle('hidden', role !== 'handyman');
+  },
+  async login(e){
+    e.preventDefault();
+    const btn = document.getElementById('login-btn');
+    btn.disabled = true; btn.textContent = 'Signing in...';
+    try {
+      const r = await app.api('/auth/login', 'POST', {
+        email: document.getElementById('login-email').value.trim(),
+        password: document.getElementById('login-password').value
+      });
+      app.saveSession(r.token, r.user);
+      app.toast('Welcome back, ' + r.user.full_name);
+      app.render();
+    } catch(err){ app.toast(err.message, true); }
+    btn.disabled = false; btn.textContent = 'Sign in';
+  },
+  async register(e){
+    e.preventDefault();
+    const btn = document.getElementById('register-btn');
+    btn.disabled = true; btn.textContent = 'Creating...';
+    try {
+      const payload = {
+        full_name: document.getElementById('reg-name').value.trim(),
+        email: document.getElementById('reg-email').value.trim(),
+        password: document.getElementById('reg-password').value,
+        phone: document.getElementById('reg-phone').value.trim(),
+        role: app.state.regRole
+      };
+      if (app.state.regRole === 'handyman') {
+        payload.category = document.getElementById('reg-category').value;
+        payload.hourly_rate = Number(document.getElementById('reg-rate').value);
+        payload.experience_years = Number(document.getElementById('reg-exp').value);
+      }
+      const r = await app.api('/auth/register', 'POST', payload);
+      app.saveSession(r.token, r.user);
+      app.toast('Account created. Welcome!');
+      app.render();
+    } catch(err){ app.toast(err.message, true); }
+    btn.disabled = false; btn.textContent = 'Create account';
+  },
+
+  // ---------- CLIENT ----------
+  async renderClient(){
+    document.getElementById('view').innerHTML = `
+      <div class="section-title">Find a handyman</div>
+      <div class="card">
+        <div class="row wrap">
+          <label style="margin:0">Filter by category</label>
+          <select id="category-filter" style="max-width:240px" onchange="app.filterCategory(this.value)">
+            <option value="">All categories</option>
+            <option>General Handyman</option><option>Plumbing</option><option>Electrical</option>
+            <option>Carpentry</option><option>Painting</option><option>Cleaning</option>
+            <option>HVAC</option><option>Appliance Repair</option>
+          </select>
+        </div>
+      </div>
+      <div id="handymen-list" class="grid cols-2" style="margin-top:16px"><div class="muted">Loading handymen...</div></div>
+      <div class="section-title">My jobs</div>
+      <div id="my-jobs"><div class="muted">Loading jobs...</div></div>
+    `;
+    await app.loadHandymen();
+    await app.loadJobs();
+  },
+  async loadHandymen(){
+    try {
+      const r = await app.api('/users/handymen' + (app.state.category ? '?category=' + encodeURIComponent(app.state.category) : ''));
+      app.state.handymen = r.handymen;
+      app.renderHandymen();
+    } catch(e){ app.toast(e.message, true); }
+  },
+  renderHandymen(){
+    const el = document.getElementById('handymen-list');
+    if (!el) return;
+    if (!app.state.handymen.length) { el.innerHTML = '<div class="muted">No handymen found.</div>'; return; }
+    el.innerHTML = app.state.handymen.map(h => `
+      <div class="card">
+        <div class="row">
+          <div class="avatar">${app.initials(h.full_name)}</div>
+          <div style="flex:1">
+            <h3>${app.esc(h.full_name)}</h3>
+            <div class="muted">${app.esc(h.category)} · ${h.experience_years} yrs experience</div>
+          </div>
+        </div>
+        <div class="row between" style="margin-top:12px">
+          <span class="stars">${app.stars(h.rating)} <span class="muted">(${Number(h.rating).toFixed(1)})</span></span>
+          <span class="muted">${h.total_jobs} jobs</span>
+        </div>
+        <div class="row between" style="margin-top:12px">
+          <b>${app.money(h.hourly_rate)}/hr</b>
+          <span class="badge ${h.is_available ? 'completed' : 'cancelled'}">${h.is_available ? 'Available' : 'Busy'}</span>
+        </div>
+        <div style="margin-top:14px">
+          <button class="btn-primary" style="width:100%" onclick="app.openBookModal(${h.id})">Book ${app.esc(h.full_name.split(' ')[0])}</button>
+        </div>
+      </div>
+    `).join('');
+  },
+  filterCategory(cat){ app.state.category = cat; app.loadHandymen(); },
+
+  openBookModal(handymanId){
+    const h = app.state.handymen.find(x => x.id === handymanId);
+    if (!h) return;
+    app.modal(`
+      <h2>Book ${app.esc(h.full_name)}</h2>
+      <p class="muted">${app.esc(h.category)} · ${app.money(h.hourly_rate)}/hr</p>
+      <form onsubmit="app.createJob(event, ${h.id})">
+        <label>Job title</label>
+        <input id="job-title" placeholder="e.g. Fix leaking kitchen faucet" required>
+        <label>Description</label>
+        <textarea id="job-desc" rows="2" placeholder="Describe what needs to be done"></textarea>
+        <label>Address</label>
+        <input id="job-address" placeholder="123 Main St, Apt 4" required>
+        <label>When</label>
+        <input id="job-when" type="datetime-local" required>
+        <label>Total price ($)</label>
+        <input id="job-amount" type="number" value="${Math.round(h.hourly_rate * 2)}" min="1" step="0.01" oninput="app.updateSplit(this.value)" required>
+        <div class="split-preview">
+          <div class="box"><div class="v" id="split-total">$0</div><div class="l">You pay</div></div>
+          <div class="box"><div class="v" style="color:var(--amber)" id="split-fee">$0</div><div class="l">Platform 18%</div></div>
+          <div class="box"><div class="v" style="color:var(--secondary)" id="split-earn">$0</div><div class="l">Handyman 82%</div></div>
+        </div>
+        <div class="row" style="margin-top:18px">
+          <button type="submit" class="btn-primary" style="flex:1" id="book-btn">Confirm booking</button>
+          <button type="button" class="btn-ghost" onclick="app.closeModal()">Cancel</button>
+        </div>
+      </form>
+    `);
+    app.updateSplit(document.getElementById('job-amount').value);
+  },
+  updateSplit(v){
+    const total = Number(v) || 0;
+    const fee = +(total * 0.18).toFixed(2);
+    const earn = +(total * 0.82).toFixed(2);
+    const t = document.getElementById('split-total'), f = document.getElementById('split-fee'), e = document.getElementById('split-earn');
+    if (t) t.textContent = app.money(total);
+    if (f) f.textContent = app.money(fee);
+    if (e) e.textContent = app.money(earn);
+  },
+  async createJob(e, handymanId){
+    e.preventDefault();
+    const btn = document.getElementById('book-btn');
+    btn.disabled = true; btn.textContent = 'Booking...';
+    try {
+      const when = document.getElementById('job-when').value; // yyyy-MM-ddTHH:mm
+      await app.api('/jobs', 'POST', {
+        handyman_id: handymanId,
+        title: document.getElementById('job-title').value.trim(),
+        description: document.getElementById('job-desc').value.trim(),
+        address: document.getElementById('job-address').value.trim(),
+        scheduled_at: when.replace('T', ' ') + ':00',
+        total_amount: Number(document.getElementById('job-amount').value)
+      });
+      app.closeModal();
+      app.toast('Job booked! Complete payment to confirm.');
+      await app.loadJobs();
+    } catch(err){ app.toast(err.message, true); }
+    btn.disabled = false; btn.textContent = 'Confirm booking';
+  },
+
+  async loadJobs(){
+    try {
+      const r = await app.api('/jobs');
+      app.state.jobs = r.jobs;
+      app.renderJobs();
+    } catch(e){ app.toast(e.message, true); }
+  },
+  renderJobs(){
+    const el = document.getElementById('my-jobs');
+    if (!el) return;
+    if (!app.state.jobs.length) { el.innerHTML = '<div class="muted">No jobs yet. Book a handyman above.</div>'; return; }
+    el.innerHTML = app.state.jobs.map(j => `
+      <div class="card" style="margin-bottom:14px">
+        <div class="between wrap">
+          <h3>${app.esc(j.title)}</h3>
+          <span class="badge ${app.esc(j.status)}">${app.esc(j.status.replace('_',' '))}</span>
+        </div>
+        <div class="muted" style="margin-top:4px">
+          ${app.esc(j.handyman_name || 'Handyman')} · ${app.esc(j.address)} · ${app.esc(j.scheduled_at)}
+        </div>
+        ${j.description ? `<div class="muted" style="margin-top:4px">${app.esc(j.description)}</div>` : ''}
+        <div class="amounts">
+          <div class="line"><span>Total</span><b>${app.money(j.total_amount)}</b></div>
+          <div class="line fee"><span>Platform fee (18%)</span><span>${app.money(j.platform_fee)}</span></div>
+          <div class="line earn"><span>Handyman receives (82%)</span><span>${app.money(j.handyman_earning)}</span></div>
+        </div>
+        <div class="row wrap" style="margin-top:12px">
+          ${(j.status === 'pending' || j.status === 'accepted') ? `<button class="btn-primary btn-sm" onclick="app.payJob(${j.id})">Pay ${app.money(j.total_amount)}</button>` : ''}
+          ${(j.status === 'pending') ? `<button class="btn-danger btn-sm" onclick="app.cancelJob(${j.id})">Cancel</button>` : ''}
+          ${(j.status === 'completed') ? `<button class="btn-secondary btn-sm" onclick="app.openReviewModal(${j.id})">Leave review</button>` : ''}
+        </div>
+      </div>
+    `).join('');
+  },
+  async payJob(jobId){
+    try {
+      const intent = await app.api('/payments/create-intent', 'POST', { job_id: jobId });
+      if (intent.demo) {
+        await app.api('/payments/confirm', 'POST', { payment_intent_id: intent.paymentIntentId, job_id: jobId });
+        app.toast('Payment simulated (demo). Handyman credited 82%.');
+      } else {
+        app.toast('Stripe intent created. Payment sheet would open on mobile.');
+      }
+      await app.loadJobs();
+    } catch(err){ app.toast(err.message, true); }
+  },
+  async cancelJob(jobId){
+    if (!confirm('Cancel this job?')) return;
+    try {
+      await app.api('/jobs/' + jobId + '/status', 'PATCH', { status: 'cancelled' });
+      app.toast('Job cancelled');
+      await app.loadJobs();
+    } catch(err){ app.toast(err.message, true); }
+  },
+
+  openReviewModal(jobId){
+    const j = app.state.jobs.find(x => x.id === jobId);
+    if (!j) return;
+    app.state.newRating = 5;
+    app.modal(`
+      <h2>Review ${app.esc(j.handyman_name || 'handyman')}</h2>
+      <p class="muted">How did the job go?</p>
+      <div id="rating-stars" style="font-size:34px;color:var(--amber);cursor:pointer;margin:12px 0;letter-spacing:6px">
+        ${app.renderRatingStars()}
+      </div>
+      <label>Comment (optional)</label>
+      <textarea id="review-comment" rows="3" placeholder="Great work, on time..."></textarea>
+      <div class="row" style="margin-top:18px">
+        <button class="btn-secondary" style="flex:1" onclick="app.submitReview(${jobId})" id="review-btn">Submit review</button>
+        <button class="btn-ghost" onclick="app.closeModal()">Cancel</button>
+      </div>
+    `);
+  },
+  renderRatingStars(){
+    return [1,2,3,4,5].map(n =>
+      `<span onclick="app.setRating(${n})">${n <= app.state.newRating ? '★' : '☆'}</span>`).join('');
+  },
+  setRating(n){
+    app.state.newRating = n;
+    document.getElementById('rating-stars').innerHTML = app.renderRatingStars();
+  },
+  async submitReview(jobId){
+    const btn = document.getElementById('review-btn');
+    btn.disabled = true;
+    try {
+      await app.api('/reviews', 'POST', {
+        job_id: jobId,
+        rating: app.state.newRating,
+        comment: document.getElementById('review-comment').value.trim()
+      });
+      app.closeModal();
+      app.toast('Review submitted. Thank you!');
+      await app.loadJobs();
+    } catch(err){ app.toast(err.message, true); }
+    btn.disabled = false;
+  },
+
+  // ---------- HANDYMAN ----------
+  async renderHandyman(){
+    document.getElementById('view').innerHTML = `
+      <div class="section-title">Earnings</div>
+      <div class="grid cols-3" id="earn-cards"><div class="muted">Loading...</div></div>
+      <div class="section-title">Job requests</div>
+      <div id="handyman-jobs"><div class="muted">Loading jobs...</div></div>
+      <div class="section-title">Reviews about me</div>
+      <div id="handyman-reviews"><div class="muted">Loading reviews...</div></div>
+    `;
+    try { app.state.earnings = await app.api('/payments/earnings'); } catch(e){ app.state.earnings = null; }
+    app.renderEarnings();
+    await app.loadJobs();
+    await app.loadMyReviews();
+  },
+  renderEarnings(){
+    const el = document.getElementById('earn-cards');
+    if (!el) return;
+    const e = app.state.earnings;
+    if (!e) { el.innerHTML = '<div class="muted">Could not load earnings.</div>'; return; }
+    const completed = e.jobs.filter(j => j.status === 'completed').length;
+    el.innerHTML = `
+      <div class="stat"><div class="value" style="color:var(--secondary)">${app.money(e.total_earnings)}</div><div class="label">Total earned (82%)</div></div>
+      <div class="stat"><div class="value" style="color:var(--amber)">${app.money(e.pending_earnings)}</div><div class="label">Pending jobs</div></div>
+      <div class="stat"><div class="value">${completed}</div><div class="label">Completed jobs</div></div>
+      <div class="stat"><div class="value" style="color:var(--amber)">${app.money(e.commission_paid)}</div><div class="label">Commission paid (18%)</div></div>
+    `;
+  },
+  async loadJobsHandyman(){ await app.loadJobs(); },
+  renderJobsHandyman(){},
+  async loadMyReviews(){
+    try {
+      const r = await app.api('/reviews/handyman/' + app.state.user.id);
+      app.state.reviews = r.reviews;
+      const el = document.getElementById('handyman-reviews');
+      if (!el) return;
+      if (!r.reviews.length) { el.innerHTML = '<div class="muted">No reviews yet.</div>'; return; }
+      el.innerHTML = r.reviews.map(v => `
+        <div class="card" style="margin-bottom:12px">
+          <div class="between">
+            <b>${app.esc(v.client_name || 'Client')}</b>
+            <span class="stars">${app.stars(v.rating)}</span>
+          </div>
+          <div class="muted" style="margin-top:6px">${app.esc(v.comment || 'No comment')}</div>
+        </div>
+      `).join('');
+    } catch(e){}
+  },
+
+  // ---------- ADMIN ----------
+  async renderAdmin(){
+    document.getElementById('view').innerHTML = `
+      <div class="section-title">Platform overview</div>
+      <div class="grid cols-3" id="admin-stats"><div class="muted">Loading...</div></div>
+      <div class="section-title">Manage</div>
+      <div class="tabs" style="max-width:360px">
+        <button id="admin-tab-users" class="active" onclick="app.setAdminTab('users')">Users</button>
+        <button id="admin-tab-jobs" onclick="app.setAdminTab('jobs')">Jobs</button>
+      </div>
+      <div id="admin-panel" style="margin-top:14px"><div class="muted">Loading...</div></div>
+    `;
+    await Promise.all([app.loadAdminStats(), app.loadAdminUsers(), app.loadAdminJobs()]);
+    app.renderAdminPanel();
+  },
+  setAdminTab(tab){
+    app.state.adminTab = tab;
+    document.getElementById('admin-tab-users').classList.toggle('active', tab === 'users');
+    document.getElementById('admin-tab-jobs').classList.toggle('active', tab === 'jobs');
+    app.renderAdminPanel();
+  },
+  async loadAdminStats(){
+    try {
+      app.state.adminStats = await app.api('/admin/stats');
+      const el = document.getElementById('admin-stats');
+      if (!el) return;
+      const s = app.state.adminStats;
+      el.innerHTML = `
+        <div class="stat"><div class="value" style="color:var(--secondary)">${app.money(s.platform_revenue)}</div><div class="label">Platform revenue (18%)</div></div>
+        <div class="stat"><div class="value">${s.users}</div><div class="label">Total users</div></div>
+        <div class="stat"><div class="value">${s.handymen}</div><div class="label">Handymen</div></div>
+        <div class="stat"><div class="value">${s.clients}</div><div class="label">Clients</div></div>
+        <div class="stat"><div class="value">${s.jobs}</div><div class="label">Total jobs</div></div>
+        <div class="stat"><div class="value">${s.completed}</div><div class="label">Completed</div></div>
+        <div class="stat"><div class="value" style="color:var(--amber)">${s.pending}</div><div class="label">Pending</div></div>
+      `;
+    } catch(e){}
+  },
+  async loadAdminUsers(){
+    try { app.state.adminUsers = (await app.api('/admin/users')).users; } catch(e){}
+  },
+  async loadAdminJobs(){
+    try { app.state.adminJobs = (await app.api('/admin/jobs')).jobs; } catch(e){}
+  },
+  renderAdminPanel(){
+    const el = document.getElementById('admin-panel');
+    if (!el) return;
+    if (app.state.adminTab === 'users') {
+      el.innerHTML = `<div class="card" style="overflow:auto"><table>
+        <tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr>
+        ${app.state.adminUsers.map(u => `
+          <tr>
+            <td>${app.esc(u.full_name)}</td>
+            <td class="muted">${app.esc(u.email)}</td>
+            <td>
+              <select style="width:130px" onchange="app.changeRole(${u.id}, this.value)">
+                <option ${u.role==='client'?'selected':''}>client</option>
+                <option ${u.role==='handyman'?'selected':''}>handyman</option>
+                <option ${u.role==='admin'?'selected':''}>admin</option>
+              </select>
+            </td>
+            <td class="muted">${app.esc((u.created_at||'').slice(0,10))}</td>
+          </tr>`).join('')}
+      </table></div>`;
+    } else {
+      el.innerHTML = `<div class="card" style="overflow:auto"><table>
+        <tr><th>Job</th><th>Client</th><th>Handyman</th><th>Status</th><th>Total</th><th>Fee 18%</th><th>Payout 82%</th></tr>
+        ${app.state.adminJobs.map(j => `
+          <tr>
+            <td>${app.esc(j.title)}</td>
+            <td>${app.esc(j.client_name || '')}</td>
+            <td>${app.esc(j.handyman_name || '')}</td>
+            <td><span class="badge ${app.esc(j.status)}">${app.esc(j.status.replace('_',' '))}</span></td>
+            <td>${app.money(j.total_amount)}</td>
+            <td style="color:var(--amber)">${app.money(j.platform_fee)}</td>
+            <td style="color:var(--secondary)">${app.money(j.handyman_earning)}</td>
+          </tr>`).join('')}
+      </table></div>`;
+    }
+  },
+  async changeRole(userId, role){
+    try {
+      await app.api('/admin/users/' + userId + '/role', 'PATCH', { role });
+      app.toast('Role updated');
+      await app.loadAdminUsers();
+    } catch(err){ app.toast(err.message, true); }
+  },
+};
+
+// Jobs list rendering differs by role — hook it up
+const origRenderJobs = app.renderJobs.bind(app);
+app.renderJobs = function(){
+  if (app.state.user && app.state.user.role === 'handyman') {
+    const el = document.getElementById('handyman-jobs');
+    if (!el) return;
+    if (!app.state.jobs.length) { el.innerHTML = '<div class="muted">No job requests yet.</div>'; return; }
+    el.innerHTML = app.state.jobs.map(j => `
+      <div class="card" style="margin-bottom:14px">
+        <div class="between wrap">
+          <h3>${app.esc(j.title)}</h3>
+          <span class="badge ${app.esc(j.status)}">${app.esc(j.status.replace('_',' '))}</span>
+        </div>
+        <div class="muted" style="margin-top:4px">
+          ${app.esc(j.client_name || 'Client')} · ${app.esc(j.address)} · ${app.esc(j.scheduled_at)}
+        </div>
+        ${j.description ? `<div class="muted" style="margin-top:4px">${app.esc(j.description)}</div>` : ''}
+        <div class="amounts">
+          <div class="line"><span>Job total</span><b>${app.money(j.total_amount)}</b></div>
+          <div class="line fee"><span>Platform fee (18%)</span><span>${app.money(j.platform_fee)}</span></div>
+          <div class="line earn"><span>You earn (82%)</span><span>${app.money(j.handyman_earning)}</span></div>
+        </div>
+        <div class="row wrap" style="margin-top:12px">
+          ${j.status === 'pending' ? `<button class="btn-primary btn-sm" onclick="app.setJobStatus(${j.id}, 'accepted')">Accept job</button>` : ''}
+          ${j.status === 'accepted' ? `<button class="btn-primary btn-sm" onclick="app.setJobStatus(${j.id}, 'in_progress')">Start job</button>` : ''}
+          ${j.status === 'in_progress' ? `<button class="btn-secondary btn-sm" onclick="app.setJobStatus(${j.id}, 'completed')">Mark complete</button>` : ''}
+        </div>
+      </div>
+    `).join('');
+  } else {
+    origRenderJobs();
+  }
+};
+
+app.setJobStatus = async function(jobId, status){
+  try {
+    await app.api('/jobs/' + jobId + '/status', 'PATCH', { status });
+    app.toast('Job ' + status.replace('_', ' '));
+    await app.loadJobs();
+    if (app.state.user.role === 'handyman') {
+      app.state.earnings = await app.api('/payments/earnings');
+      app.renderEarnings();
+    }
+  } catch(err){ app.toast(err.message, true); }
+};
+
+app.boot();
+</script>
+</body>
+</html>
