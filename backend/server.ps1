@@ -11,6 +11,8 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $dataFile = Join-Path $root 'psdata.json'
 $indexFile = Join-Path $root 'public\index.html'
+$landingFile = Join-Path $root 'public\landing.html'
+$pricingFile = Join-Path $root 'public\pricing.html'
 
 # ---------- helpers ----------
 function ConvertTo-Hashtable {
@@ -149,20 +151,26 @@ function Handle-Request($db, $req, $res) {
 
   $user = Get-AuthUser $db $req
 
-  # --- static web app ---
-  if ($method -eq 'GET' -and ($path -eq '/' -or $path -eq '/index.html')) {
-    $content = [IO.File]::ReadAllBytes($indexFile)
-    $res.StatusCode = 200
-    $res.ContentType = 'text/html; charset=utf-8'
-    $res.ContentLength64 = $content.Length
-    $res.OutputStream.Write($content, 0, $content.Length)
-    $res.Close()
-    return
+  # --- static pages ---
+  if ($method -eq 'GET') {
+    $pageFile = $null
+    if ($path -eq '/' -or $path -eq '/landing.html') { $pageFile = $landingFile }
+    elseif ($path -eq '/pricing' -or $path -eq '/pricing.html') { $pageFile = $pricingFile }
+    elseif ($path -eq '/app' -or $path -eq '/index.html') { $pageFile = $indexFile }
+    if ($pageFile) {
+      $content = [IO.File]::ReadAllBytes($pageFile)
+      $res.StatusCode = 200
+      $res.ContentType = 'text/html; charset=utf-8'
+      $res.ContentLength64 = $content.Length
+      $res.OutputStream.Write($content, 0, $content.Length)
+      $res.Close()
+      return
+    }
   }
 
   # --- health & config ---
   if ($path -eq '/health') { Send-Json $res 200 @{ status = 'ok' }; return }
-  if ($path -eq '/api/config') { Send-Json $res 200 @{ demoMode = $true; commission = 0.18; appName = 'Handyman Pro' }; return }
+  if ($path -eq '/api/config') { Send-Json $res 200 @{ demoMode = $true; commission = 0.18; appName = 'Handyman Pro'; googleClientId = '' }; return }
 
   # --- auth ---
   if ($method -eq 'POST' -and $path -eq '/api/auth/register') {
@@ -194,6 +202,24 @@ function Handle-Request($db, $req, $res) {
     $hash = Hash-Password $body.password
     $u = $db.users | Where-Object { $_.email -eq $body.email -and $_.password_hash -eq $hash } | Select-Object -First 1
     if (-not $u) { Send-Err $res 401 'Invalid credentials'; return }
+    $token = New-Token $db $u.id
+    Save-Db $db
+    Send-Json $res 200 @{ token=$token; user=(Get-PubUser $u) }
+    return
+  }
+
+  if ($method -eq 'POST' -and $path -eq '/api/auth/google') {
+    $email = 'google.demo@handyman.app'
+    $u = $db.users | Where-Object { $_.email -eq $email } | Select-Object -First 1
+    if (-not $u) {
+      $u = @{
+        id = [int]$db.seq; email = $email; password_hash = (Hash-Password ([guid]::NewGuid().ToString()));
+        role = 'client'; full_name = 'Google Demo User'; phone = ''; address = '';
+        created_at = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ss.fffZ')
+      }
+      $db.seq = [int]$db.seq + 1
+      $db.users += ,$u
+    }
     $token = New-Token $db $u.id
     Save-Db $db
     Send-Json $res 200 @{ token=$token; user=(Get-PubUser $u) }

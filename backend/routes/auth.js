@@ -121,6 +121,57 @@ router.post('/login', (req, res) => {
   }
 });
 
+// GOOGLE SIGN-IN
+router.post('/google', async (req, res) => {
+  try {
+    const { credential, demo } = req.body || {};
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    let email, full_name;
+
+    if (credential && clientId) {
+      const r = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(credential));
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok || data.aud !== clientId) {
+        return res.status(401).json({ error: 'Invalid Google token' });
+      }
+      if (String(data.email_verified) !== 'true') {
+        return res.status(401).json({ error: 'Google email not verified' });
+      }
+      email = String(data.email).toLowerCase();
+      full_name = data.name || email.split('@')[0];
+    } else if (demo && (!clientId || process.env.DEMO_MODE === 'true')) {
+      email = 'google.demo@handyman.app';
+      full_name = 'Google Demo User';
+    } else {
+      return res.status(400).json({ error: 'Google sign-in is not configured. Set GOOGLE_CLIENT_ID in backend/.env.' });
+    }
+
+    let user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+    if (!user) {
+      const randomPassword = require('crypto').randomBytes(24).toString('hex');
+      const hash = bcrypt.hashSync(randomPassword, 10);
+      const info = db.prepare(
+        'INSERT INTO users (email, password_hash, role, full_name) VALUES (?, ?, ?, ?)'
+      ).run(email, hash, 'client', full_name);
+      user = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role, full_name: user.full_name },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      token,
+      user: { id: user.id, email: user.email, role: user.role, full_name: user.full_name, phone: user.phone, address: user.address }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // ME
 router.get('/me', (req, res) => {
   const authHeader = req.headers['authorization'];

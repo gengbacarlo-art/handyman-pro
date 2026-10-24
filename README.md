@@ -2,8 +2,10 @@
 
 Connects clients with local handymen. Platform takes **18% commission** on every job.
 
-**You get two frontends:**
-- **Web app** (at `http://localhost:4000`) — works immediately, no Android tooling needed
+**You get three surfaces:**
+- **Landing page** at `http://localhost:4000/` — marketing site with features, how it works and pricing links
+- **Pricing page** at `http://localhost:4000/pricing` — client/handyman plans and the 18% split explained
+- **Web app** at `http://localhost:4000/app` — works immediately, no Android tooling needed
 - **Android app** (Kotlin + Jetpack Compose) — in the `android/` folder
 
 ## Tech Stack
@@ -21,9 +23,11 @@ handyman-marketplace/
 │   ├── db.js             # SQLite connection
 │   ├── schema.sql        # Database schema + seed
 │   ├── public/
-│   │   └── index.html    # Web app (client + handyman + admin)
+│   │   ├── landing.html  # Marketing landing page (/)
+│   │   ├── pricing.html  # Pricing page (/pricing)
+│   │   └── index.html    # Web app (client + handyman + admin) (/app)
 │   └── routes/
-│       ├── auth.js       # Register/login (creates Stripe Connect accounts)
+│       ├── auth.js       # Register/login/Google (creates Stripe Connect accounts)
 │       ├── users.js
 │       ├── jobs.js
 │       ├── payments.js   # Stripe, 18% commission, demo mode
@@ -44,7 +48,9 @@ cd handyman-marketplace\backend
 powershell -ExecutionPolicy Bypass -NoProfile -File server.ps1
 ```
 
-- Web app + API: **http://localhost:4000**
+- Landing page: **http://localhost:4000/**
+- Pricing: **http://localhost:4000/pricing**
+- Web app + API: **http://localhost:4000/app**
 - Data is stored in `backend/psdata.json` (pure demo mode, no Stripe).
 
 ### Option B — Node.js backend (full version)
@@ -56,7 +62,7 @@ npm start
 ```
 
 ### 2. Open the web app
-Go to **http://localhost:4000** in your browser.
+Go to **http://localhost:4000/app** in your browser (landing page: **http://localhost:4000/**).
 
 ### 3. Try it
 1. **Register a client** (e.g. alice@example.com) — or use the seeded admin below
@@ -81,6 +87,24 @@ To enable **real payments**:
    ```
 3. Restart the backend. Handymen registering now get **Stripe Connect Express** accounts, and each payment automatically splits: **18% to your platform, 82% to the handyman**.
 
+## Google Sign-In (optional)
+
+The sign-in screen has a **Continue with Google** button.
+
+- **Without configuration** (default) it runs in demo mode and signs you in as a demo Google client account — useful for testing.
+- **With a real OAuth client ID**, it uses Google Identity Services and verifies the ID token on the backend:
+
+1. Open https://console.cloud.google.com/apis/credentials
+2. Create an **OAuth 2.0 Client ID → Web application**
+3. Add `http://localhost:4000` to **Authorized JavaScript origins**
+4. Put the client ID in `backend/.env`:
+   ```
+   GOOGLE_CLIENT_ID=1234567890-abc.apps.googleusercontent.com
+   ```
+5. Restart the backend. The demo button is replaced by the official Google button.
+
+Google sign-in creates a **client** account on first use (handymen still register through the normal form so their trade profile and Stripe Connect account are set up).
+
 ## Commission Flow (18%)
 Every job stores:
 - `platform_fee` = `total_amount * 0.18` → your revenue
@@ -93,6 +117,7 @@ With real Stripe keys, `application_fee_amount` routes the 18% to the platform a
 |--------|----------|-------------|
 | POST | /api/auth/register | Register (client or handyman) |
 | POST | /api/auth/login | Login |
+| POST | /api/auth/google | Google sign-in (ID token or demo) |
 | GET | /api/auth/me | Current user |
 | GET | /api/users/handymen | List handymen (optional `?category=`) |
 | POST | /api/jobs | Create/booking a job |

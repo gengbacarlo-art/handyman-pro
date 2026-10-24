@@ -44,9 +44,15 @@ app.get('/api/config', (req, res) => {
   res.json({
     demoMode: !process.env.STRIPE_SECRET_KEY || process.env.DEMO_MODE === 'true',
     commission: 0.18,
-    appName: 'Handyman Pro'
+    appName: 'Handyman Pro',
+    googleClientId: process.env.GOOGLE_CLIENT_ID || ''
   });
 });
+
+// Marketing pages (landing at /, pricing at /pricing) and the app at /app
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'landing.html')));
+app.get('/pricing', (req, res) => res.sendFile(path.join(__dirname, 'public', 'pricing.html')));
+app.get('/app', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
 // Serve the web app
 app.use(express.static(path.join(__dirname, 'public')));

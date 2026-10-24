@@ -60,6 +60,12 @@
   .role-toggle{display:flex;gap:8px}
   .role-toggle button{flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--muted)}
   .role-toggle button.active{background:var(--secondary);color:#04231A;border-color:var(--secondary)}
+  .divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:var(--muted);font-size:12px}
+  .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+  .btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#fff;color:#1F2937;border-radius:9px;padding:10px 12px;font-weight:600;font-size:14px;border:none;cursor:pointer;transition:.15s}
+  .btn-google:hover{background:#F3F4F6}
+  .btn-google svg{width:18px;height:18px;flex-shrink:0}
+  #google-btn{display:flex;justify-content:center}
 
   /* ---- Badges & stars ---- */
   .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;text-transform:capitalize}
@@ -167,6 +173,9 @@
         </div>
       </form>
 
+      <div class="divider"><span>or continue with</span></div>
+      <div id="google-btn"></div>
+
       <p class="muted" style="margin-top:16px;font-size:12px">
         Demo accounts — Admin: <b>admin@handyman.app</b> / <b>admin123</b> · Handyman: <b>bob@builder.com</b> / <b>password123</b>
       </p>
@@ -264,6 +273,15 @@ async function mockRequest(path, method, body){
       db.profiles.push({ user_id: u.id, category: body.category || 'General Handyman', hourly_rate: body.hourly_rate || 50, bio: body.bio || null, experience_years: body.experience_years || 0, is_available: 1, rating: 0, total_jobs: 0 });
     }
     save();
+    return { token: 'mock_' + u.id, user: pub(u) };
+  }
+  if (segs[0] === 'auth' && segs[1] === 'google' && method === 'POST') {
+    const email = 'google.demo@handyman.app';
+    let u = db.users.find(x => x.email === email);
+    if (!u) {
+      u = { id: db.seq++, email, password: '', role: 'client', full_name: 'Google Demo User', phone: null, address: null, created_at: new Date().toISOString() };
+      db.users.push(u); save();
+    }
     return { token: 'mock_' + u.id, user: pub(u) };
   }
   if (segs[0] === 'auth' && segs[1] === 'me') return { user: pub(requireUser()) };
@@ -488,7 +506,7 @@ const app = {
     const authed = !!app.state.user;
     document.getElementById('auth-screen').classList.toggle('hidden', authed);
     document.getElementById('app').classList.toggle('hidden', !authed);
-    if (!authed) return;
+    if (!authed) { app.setupGoogle(); return; }
 
     document.getElementById('header-name').textContent = app.state.user.full_name;
     document.getElementById('header-role').textContent = app.state.user.role;
@@ -566,6 +584,58 @@ const app = {
       app.render();
     } catch(err){ app.toast(err.message, true); }
     btn.disabled = false; btn.textContent = 'Create account';
+  },
+
+  // ---------- Google sign-in ----------
+  setupGoogle(){
+    const el = document.getElementById('google-btn');
+    if (!el || el.dataset.ready) return;
+    const cid = app.state.config && app.state.config.googleClientId;
+    if (!cid) { app.googleDemoButton(el); return; }
+    const mount = () => {
+      try {
+        window.google.accounts.id.initialize({
+          client_id: cid,
+          callback: (resp) => app.handleGoogleCredential(resp.credential)
+        });
+        window.google.accounts.id.renderButton(el, {
+          theme: 'filled_black', size: 'large', shape: 'rect', width: 360,
+          text: 'continue_with', logo_alignment: 'center'
+        });
+        el.dataset.ready = '1';
+      } catch(e){ app.googleDemoButton(el); }
+    };
+    if (window.google && window.google.accounts) { mount(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client';
+    s.async = true; s.defer = true;
+    s.onload = mount;
+    s.onerror = () => app.googleDemoButton(el);
+    document.head.appendChild(s);
+  },
+  googleDemoButton(el){
+    if (!el) el = document.getElementById('google-btn');
+    if (!el) return;
+    el.innerHTML = '<button type="button" class="btn-google" onclick="app.googleDemo()">' +
+      '<svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.1 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.1 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.2 5.2C36.9 39.2 44 34 44 24c0-1.2-.1-2.4-.4-3.5z"/></svg>' +
+      ' Continue with Google <span style="color:#6B7280;font-weight:500;font-size:12px">(demo)</span></button>';
+    el.dataset.ready = '1';
+  },
+  async googleDemo(){
+    try {
+      const r = await app.api('/auth/google', 'POST', { demo: true });
+      app.saveSession(r.token, r.user);
+      app.toast('Signed in with Google (demo)');
+      app.render();
+    } catch(e){ app.toast(e.message, true); }
+  },
+  async handleGoogleCredential(credential){
+    try {
+      const r = await app.api('/auth/google', 'POST', { credential });
+      app.saveSession(r.token, r.user);
+      app.toast('Signed in with Google');
+      app.render();
+    } catch(e){ app.toast(e.message, true); }
   },
 
   // ---------- CLIENT ----------
