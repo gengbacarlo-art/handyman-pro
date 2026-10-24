@@ -18,6 +18,8 @@
   /* ---- Layout ---- */
   header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:var(--panel);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
   .brand{font-weight:700;font-size:18px;display:flex;align-items:center;gap:8px}
+  .brand a{color:inherit;display:flex;align-items:center;gap:8px;text-decoration:none}
+  .brand a:hover{color:var(--primary)}
   .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--secondary)}
   .userbox{display:flex;align-items:center;gap:12px;font-size:14px}
   .role-pill{background:var(--panel2);border:1px solid var(--border);padding:3px 10px;border-radius:999px;font-size:12px;color:var(--muted);text-transform:capitalize}
@@ -186,8 +188,9 @@
 <!-- MAIN APP -->
 <div id="app" class="hidden">
   <header>
-    <div class="brand"><span class="dot"></span> Handyman Pro</div>
+    <div class="brand"><a href="/"><span class="dot"></span> Handyman Pro</a></div>
     <div class="userbox">
+      <a href="/pricing" style="color:var(--muted);text-decoration:none;font-size:13px">Pricing</a>
       <span class="role-pill" id="header-role"></span>
       <span id="header-name"></span>
       <button class="btn-ghost btn-sm" onclick="app.logout()">Log out</button>
